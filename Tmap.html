@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tmap 대중교통 경로 찾기</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://topopentile1.tmap.co.kr/scriptSDKV2/tmapjs2.min.js?version=20231206"></script>
+  <style>
+    #map_div { width: 100%; height: 500px; }
+    #search-panel { background: white; padding: 10px; z-index: 10; position: absolute; top: 10px; left: 10px; width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    .result-list { list-style: none; padding: 0; margin: 5px 0; max-height: 100px; overflow-y: auto; background: #f9f9f9; }
+    .result-list li { padding: 5px; cursor: pointer; border-bottom: 1px solid #ddd; }
+    .result-list li:hover { background: #e9e9e9; }
+  </style>
+</head>
+<body>
+  <div id="search-panel">
+    <input type="text" id="start" placeholder="출발지 입력" />
+    <ul id="start-results" class="result-list"></ul>
+    <input type="text" id="end" placeholder="도착지 입력" />
+    <ul id="end-results" class="result-list"></ul>
+    <button id="find-route">경로 찾기</button>
+  </div>
+  <div id="map_div"></div>
+
+  <script>
+    let map;
+    let startMarker, endMarker;
+    let startCoords, endCoords;
+
+    $(document).ready(function () {
+      map = new Tmapv2.Map("map_div", {
+        center: new Tmapv2.LatLng(37.5652045, 126.98702028),
+        width: "100%",
+        height: "500px",
+        zoom: 15
+      });
+
+      function searchPOI(keyword, callback) {
+        $.ajax({
+          method: "GET",
+          url: `https://apis.openapi.sk.com/tmap/pois?version=1&searchKeyword=${keyword}&resCoordType=WGS84GEO&reqCoordType=WGS84GEO&count=5&appKey=z1X5bjuncu1DaI5iBjpsr4lNU0JKTgEV9EqYsp50`,
+          success: function (response) {
+            callback(response.searchPoiInfo.pois.poi);
+          },
+          error: function () {
+            alert("POI 검색 실패");
+          }
+        });
+      }
+
+      function addListItems(listId, results, isStart) {
+        const $list = $(listId).empty();
+        results.forEach(poi => {
+          const li = $("<li>").text(poi.name).on("click", () => {
+            const coords = new Tmapv2.LatLng(poi.frontLat, poi.frontLon);
+            if (isStart) {
+              startCoords = coords;
+              if (startMarker) startMarker.setMap(null);
+              startMarker = new Tmapv2.Marker({ position: coords, map });
+            } else {
+              endCoords = coords;
+              if (endMarker) endMarker.setMap(null);
+              endMarker = new Tmapv2.Marker({ position: coords, map });
+            }
+            map.setCenter(coords);
+            $list.empty();
+          });
+          $list.append(li);
+        });
+      }
+
+      $("#start").on("keyup", function () {
+        const keyword = $(this).val();
+        if (keyword.length > 1) {
+          searchPOI(keyword, results => addListItems("#start-results", results, true));
+        }
+      });
+
+      $("#end").on("keyup", function () {
+        const keyword = $(this).val();
+        if (keyword.length > 1) {
+          searchPOI(keyword, results => addListItems("#end-results", results, false));
+        }
+      });
+
+      $("#find-route").on("click", function () {
+        if (!startCoords || !endCoords) {
+          alert("출발지와 도착지를 모두 선택하세요.");
+          return;
+        }
+
+        $.ajax({
+          method: "POST",
+          url: "https://apis.openapi.sk.com/transit/routes",
+          headers: {
+            "appKey": "z1X5bjuncu1DaI5iBjpsr4lNU0JKTgEV9EqYsp50",
+            "Content-Type": "application/json"
+          },
+          data: JSON.stringify({
+            startX: startCoords.lng(),
+            startY: startCoords.lat(),
+            endX: endCoords.lng(),
+            endY: endCoords.lat(),
+            lang: 0,
+            format: "json"
+          }),
+          success: function (data) {
+            console.log("대중교통 경로 결과", data);
+            alert("경로 요청 성공. 콘솔을 확인하세요.");
+          },
+          error: function (xhr) {
+            console.error("경로 요청 실패:", xhr.status, xhr.responseText);
+            alert("경로 요청 실패. 콘솔을 확인하세요.");
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
