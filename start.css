@@ -1,0 +1,104 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+  }
+  
+  /* Spacer */
+  .spacer {
+    flex: 1;
+  }
+  
+  /* Recognition container */
+  .recognition-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Loading circle animation */
+  .loading-circle {
+    position: relative;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 2rem;
+  }
+  
+  .outer-circle {
+    position: absolute;
+    inset: 0;
+    border: 4px solid black;
+    border-radius: 50%;
+  }
+  
+  .inner-circle {
+    position: absolute;
+    inset: 0;
+    margin: 0.75rem;
+    background-color: black;
+    border-radius: 50%;
+  }
+  
+  /* Recognition text */
+  .recognition-text {
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  
+  /* Button container */
+  .button-container {
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: 2rem;
+  }
+  
+  /* Send button */
+  .send-button {
+    width: 100%;
+    display: flex;
+    border: 2px solid #0080ff;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+  
+  .button-empty {
+    flex: 1;
+    height: 3.5rem;
+  }
+  
+  .button-send {
+    width: 6rem;
+    height: 3.5rem;
+    border-left: 2px solid #0080ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0080ff;
+    font-weight: 500;
+  }
+  
+  /* Hover effects */
+  .button-send:hover {
+    background-color: rgba(0, 128, 255, 0.05);
+    cursor: pointer;
+  }
+  
+  /* Focus styles for accessibility */
+  .button-send:focus {
+    outline: 2px solid #0080ff;
+    outline-offset: 2px;
+  }
