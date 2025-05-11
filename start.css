@@ -1,4 +1,4 @@
-/* Reset and base styles */
+/* 기본 스타일 초기화 */
 * {
     margin: 0;
     padding: 0;
@@ -12,24 +12,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
   }
   
-  /* Spacer */
-  .spacer {
-    flex: 1;
-  }
-  
-  /* Recognition container */
+  /* 인식 컨테이너 */
   .recognition-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    flex: 1;
   }
   
-  /* Loading circle animation */
+  /* 로딩 원형 애니메이션 */
   .loading-circle {
     position: relative;
     width: 4rem;
@@ -52,53 +46,63 @@
     border-radius: 50%;
   }
   
-  /* Recognition text */
+  /* 인식 텍스트 */
   .recognition-text {
     font-size: 1.25rem;
     font-weight: 500;
     text-align: center;
   }
   
-  /* Button container */
-  .button-container {
+  /* 입력창 컨테이너 */
+  .input-container {
     width: 100%;
-    margin-top: auto;
+    padding: 0 1rem;
     margin-bottom: 2rem;
   }
   
-  /* Send button */
-  .send-button {
+  /* 입력창과 전송 버튼 */
+  .message-input-group {
     width: 100%;
     display: flex;
-    border: 2px solid #0080ff;
+    border: 1px solid #0080ff;
     border-radius: 0.375rem;
     overflow: hidden;
   }
   
-  .button-empty {
+  /* 텍스트 입력창 */
+  .message-input {
     flex: 1;
     height: 3.5rem;
+    padding: 0 1rem;
+    border: none;
+    outline: none;
   }
   
-  .button-send {
+  /* 전송 버튼 */
+  .send-button {
     width: 6rem;
     height: 3.5rem;
-    border-left: 2px solid #0080ff;
+    border-left: 1px solid #0080ff;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #0080ff;
     font-weight: 500;
-  }
-  
-  /* Hover effects */
-  .button-send:hover {
-    background-color: rgba(0, 128, 255, 0.05);
+    background-color: transparent;
     cursor: pointer;
   }
   
-  /* Focus styles for accessibility */
-  .button-send:focus {
+  /* 호버 효과 */
+  .send-button:hover {
+    background-color: rgba(0, 128, 255, 0.05);
+  }
+  
+  /* 접근성을 위한 포커스 스타일 */
+  .message-input:focus {
+    outline: none;
+  }
+  
+  .send-button:focus {
     outline: 2px solid #0080ff;
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
