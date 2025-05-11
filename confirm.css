@@ -12,15 +12,6 @@ body {
   width: 100%;
 }
 
-/* 메인 컨테이너 */
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding: 0 1rem;
-}
-
 /* 입력 텍스트 표시 영역 */
 .input-display {
   font-size: 1.25rem;
@@ -32,17 +23,11 @@ body {
 }
 
 /* 원형 컨테이너 */
-.circles-container {
+.container {
   display: flex;
   gap: 0.5rem;
   margin-top: 35vh; /* 화면 중앙보다 약간 위에 위치 */
   margin-bottom: 2rem;
-}
-
-/* 개별 원형 */
-.circle {
-  width: 0.75rem;
-  height: 0.75rem;
   border: 2px solid black;
   border-radius: 50%;
 }
