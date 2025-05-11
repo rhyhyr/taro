@@ -17,9 +17,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  padding: 1rem;
+  padding: 0 1rem;
 }
 
 /* 입력 텍스트 표시 영역 */
@@ -36,13 +35,14 @@ body {
 .circles-container {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 3rem;
+  margin-top: 35vh; /* 화면 중앙보다 약간 위에 위치 */
+  margin-bottom: 2rem;
 }
 
 /* 개별 원형 */
 .circle {
-  width: 1rem;
-  height: 1rem;
+  width: 0.75rem;
+  height: 0.75rem;
   border: 2px solid black;
   border-radius: 50%;
 }
@@ -50,8 +50,8 @@ body {
 /* 확인 텍스트 */
 .confirmation-text {
   font-size: 1.5rem;
-  font-weight: 500;
-  margin-bottom: 3rem;
+  font-weight: 400;
+  margin-bottom: 8rem; /* 텍스트와 버튼 사이 간격 늘림 */
   text-align: center;
 }
 
@@ -60,7 +60,8 @@ body {
   display: flex;
   gap: 1rem;
   width: 100%;
-  max-width: 24rem;
+  max-width: 350px;
+  margin-bottom: 5rem;
 }
 
 /* 확인 버튼 */
@@ -74,29 +75,19 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  font-weight: 500;
+  font-weight: 400;
   color: #0080ff;
   cursor: pointer;
 }
 
-/* 호버 효과 */
-.confirm-button:hover {
-  background-color: rgba(0, 128, 255, 0.05);
-}
-
 /* 접근성을 위한 포커스 스타일 */
 .confirm-button:focus {
-  outline: 2px solid #0080ff;
-  outline-offset: 2px;
+  outline: none;
 }
 
-/* 미디어 쿼리 - 반응형 */
-@media (max-width: 640px) {
+/* 미디어 쿼리 - 모바일 최적화 */
+@media (max-width: 380px) {
   .button-container {
-    padding: 0 1rem;
-  }
-  
-  .confirmation-text {
-    font-size: 1.25rem;
+    max-width: 100%;
   }
 }
