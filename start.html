@@ -4,33 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>음성 인식</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="flex flex-col items-center min-h-screen bg-white">
-  <!-- 음성 인식 표시기 -->
-  <div class="flex flex-col items-center justify-center flex-1">
-    <!-- 원형 로딩 애니메이션 -->
-    <div class="relative w-16 h-16 mb-8">
-      <div class="absolute inset-0 border-4 border-black rounded-full"></div>
-      <div class="absolute inset-0 m-3 bg-black rounded-full"></div>
+<body>
+  <div class="container">
+    <!-- 음성 인식 표시기 -->
+    <div class="recognition-container">
+      <!-- 원형 로딩 애니메이션 -->
+      <div class="loading-circle">
+        <div class="outer-circle"></div>
+        <div class="inner-circle"></div>
+      </div>
+      
+      <!-- 인식 텍스트 -->
+      <p class="recognition-text">음성 인식 중...</p>
     </div>
     
-    <!-- 인식 텍스트 -->
-    <p class="text-xl font-medium text-center">음성 인식 중...</p>
-  </div>
-  
-  <!-- 하단 입력창과 버튼 -->
-  <div class="w-full px-4 mb-8">
-    <div class="w-full border border-blue-500 rounded-md flex overflow-hidden">
-      <input 
-        type="text" 
-        class="flex-1 h-14 px-4 outline-none" 
-        placeholder="메시지를 입력하세요"
-      />
-      <button class="w-24 h-14 border-l border-blue-500 flex items-center justify-center text-blue-500 font-medium" onclick="location.href='confirm.html'">
-        전송
-      </button>
+    <!-- 하단 입력창과 버튼 -->
+    <div class="input-container">
+      <div class="message-input-group">
+        <input 
+          type="text" 
+          id="userInput"
+          class="message-input" 
+          placeholder="메시지를 입력하세요"
+        />
+        <button class="send-button" onclick="saveAndNavigate()">전송</button>
+      </div>
     </div>
   </div>
+
+  <script>
+    // 전송 버튼 클릭 시 실행되는 함수
+    function saveAndNavigate() {
+      // 입력값 가져오기
+      const inputText = document.getElementById('userInput').value;
+      
+      // 입력값이 비어있지 않으면 저장하고 다음 페이지로 이동
+      if (inputText.trim() !== '') {
+        // 로컬 스토리지에 저장
+        localStorage.setItem('userInputText', inputText);
+        
+        // 확인 페이지로 이동
+        window.location.href = 'confirm.html';
+      } else {
+        alert('메시지를 입력해주세요.');
+      }
+    }
+
+    // 엔터 키 입력 시 전송 버튼 클릭과 동일한 효과
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        saveAndNavigate();
+      }
+    });
+  </script>
 </body>
 </html>
