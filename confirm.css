@@ -1,4 +1,4 @@
-/* 기본 스타일 초기화 */
+/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
@@ -12,67 +12,79 @@ body {
   width: 100%;
 }
 
-/* 메인 컨테이너 */
+/* Main container */
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
-  padding: 0 1rem;
+  padding: 1rem;
 }
 
-/* 입력 텍스트 표시 영역 */
-.input-display {
-  margin-top: 35vh; /* 화면 중앙보다 약간 위에 위치 - 원래 circles-container가 있던 위치 */
-  margin-bottom: 2rem;
-  font-size: 1.25rem;
-  font-weight: 500;
-  text-align: center;
-  max-width: 80%;
-  word-break: break-word;
+/* Circles container */
+.circles-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 3rem;
 }
 
-/* 확인 텍스트 */
+/* Individual circle */
+.circle {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid black;
+  border-radius: 50%;
+}
+
+/* Confirmation text */
 .confirmation-text {
   font-size: 1.5rem;
-  font-weight: 400;
-  margin-bottom: 8rem; /* 텍스트와 버튼 사이 간격 늘림 */
+  font-weight: 500;
+  margin-bottom: 3rem;
   text-align: center;
 }
 
-/* 버튼 컨테이너 */
+/* Button container */
 .button-container {
   display: flex;
   gap: 1rem;
   width: 100%;
-  max-width: 350px;
-  margin-bottom: 5rem;
+  max-width: 24rem;
 }
 
-/* 확인 버튼 */
+/* Confirmation buttons */
 .confirm-button {
   flex: 1;
   height: 5rem;
-  border: 1px solid #0080ff;
-  border-radius: 0.375rem;
+  border: 1px solid black;
   background-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  font-weight: 400;
-  color: #0080ff;
+  font-weight: 500;
   cursor: pointer;
 }
 
-/* 접근성을 위한 포커스 스타일 */
-.confirm-button:focus {
-  outline: none;
+/* Hover effects */
+.confirm-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* 미디어 쿼리 - 모바일 최적화 */
-@media (max-width: 380px) {
+/* Focus styles for accessibility */
+.confirm-button:focus {
+  outline: 2px solid black;
+  outline-offset: 2px;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 640px) {
   .button-container {
-    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .confirmation-text {
+    font-size: 1.25rem;
   }
 }
