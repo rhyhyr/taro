@@ -5,16 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>권한 및 동의 화면</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .btn-active {
+      background-color: white !important;
+      color: #0080ff !important;
+      border: 2px solid #0080ff !important;
+    }
+  </style>
 </head>
 <body class="bg-white flex flex-col items-center min-h-screen">
   <!-- 위치 권한 섹션 -->
   <div class="flex flex-col items-center mt-32 mb-16 w-full px-6">
     <p class="text-lg font-medium text-center mb-6">위치 권한을 허용 하시겠습니까?</p>
-    <div class="flex gap-4 w-full max-w-xs">
-      <button class="flex-1 py-3 px-4 rounded-lg border border-blue-500 text-blue-500 font-medium">
-        거부
-      </button>
-      <button class="flex-1 py-3 px-4 rounded-lg bg-blue-500 text-white font-medium">
+    <div class="flex justify-center w-full">
+      <button id="allowBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium" onclick="toggleButton('allowBtn')">
         허용
       </button>
     </div>
@@ -23,14 +27,70 @@
   <!-- 개인정보 동의 섹션 -->
   <div class="flex flex-col items-center mb-16 w-full px-6">
     <p class="text-base font-medium text-center mb-6">개인정보 제 3자 제공에 동의합니다.</p>
-    <div class="flex gap-4 w-full max-w-xs">
-      <button class="flex-1 py-3 px-4 rounded-lg border border-blue-500 text-blue-500 font-medium">
+    <div class="flex gap-4 w-full max-w-xs justify-center">
+      <button id="disagreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium" onclick="toggleButton('disagreeBtn')">
         비동의
       </button>
-      <button class="flex-1 py-3 px-4 rounded-lg bg-blue-500 text-white font-medium">
+      <button id="agreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium" onclick="toggleButton('agreeBtn')">
         동의
       </button>
     </div>
   </div>
+
+  <script>
+    // 각 섹션의 선택 상태를 저장하는 변수
+    let locationPermissionSelected = false;
+    let privacyAgreementSelected = false;
+    
+    // 버튼 클릭 시 스타일 변경 함수
+    function toggleButton(buttonId) {
+      const button = document.getElementById(buttonId);
+      
+      // 버튼 스타일 토글
+      if (button.classList.contains('btn-active')) {
+        button.classList.remove('btn-active');
+        
+        // 상태 업데이트
+        if (buttonId === 'allowBtn') {
+          locationPermissionSelected = false;
+        } else {
+          privacyAgreementSelected = false;
+        }
+      } else {
+        button.classList.add('btn-active');
+        
+        // 상태 업데이트
+        if (buttonId === 'allowBtn') {
+          locationPermissionSelected = true;
+        } else {
+          privacyAgreementSelected = true;
+        }
+      }
+      
+      // 개인정보 동의 섹션에서는 한 버튼만 활성화되도록 함
+      if (buttonId === 'disagreeBtn' || buttonId === 'agreeBtn') {
+        const otherButtonId = buttonId === 'disagreeBtn' ? 'agreeBtn' : 'disagreeBtn';
+        const otherButton = document.getElementById(otherButtonId);
+        
+        // 다른 버튼이 활성화되어 있으면 비활성화
+        if (otherButton.classList.contains('btn-active')) {
+          otherButton.classList.remove('btn-active');
+        }
+      }
+      
+      // 두 섹션 모두 선택되었는지 확인하고 다음 페이지로 이동
+      checkAndNavigate();
+    }
+    
+    // 두 섹션 모두 선택되었는지 확인하고 다음 페이지로 이동하는 함수
+    function checkAndNavigate() {
+      if (locationPermissionSelected && privacyAgreementSelected) {
+        // 잠시 후 다음 페이지로 이동 (사용자가 버튼 변경을 볼 수 있도록)
+        setTimeout(() => {
+          window.location.href = 'start.html';
+        }, 500);
+      }
+    }
+  </script>
 </body>
 </html>
