@@ -121,10 +121,7 @@
       // 전송 버튼 클릭 이벤트
       sendButton.addEventListener('click', () => {
         if (messageInput.value.trim() !== '') {
-          alert("메시지 전송: " + messageInput.value);
-          // 여기에 메시지 전송 로직 추가
-          messageInput.value = '';
-          resultContainer.classList.add('hidden');
+          window.location.href = 'confirm.html';
         }
       });
       
