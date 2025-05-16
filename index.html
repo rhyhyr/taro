@@ -18,7 +18,7 @@
   <div class="flex flex-col items-center mt-32 mb-16 w-full px-6">
     <p class="text-lg font-medium text-center mb-6">위치 권한을 허용 하시겠습니까?</p>
     <div class="flex justify-center w-full">
-      <button id="allowBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium" onclick="toggleButton('allowBtn')">
+      <button id="allowBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium">
         허용
       </button>
     </div>
@@ -28,10 +28,10 @@
   <div class="flex flex-col items-center mb-16 w-full px-6">
     <p class="text-base font-medium text-center mb-6">개인정보 제 3자 제공에 동의합니다.</p>
     <div class="flex gap-4 w-full max-w-xs justify-center">
-      <button id="disagreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium" onclick="toggleButton('disagreeBtn')">
+      <button id="disagreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium">
         비동의
       </button>
-      <button id="agreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium" onclick="toggleButton('agreeBtn')">
+      <button id="agreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium">
         동의
       </button>
     </div>
@@ -41,6 +41,47 @@
     // 각 섹션의 선택 상태를 저장하는 변수
     let locationPermissionSelected = false;
     let privacyAgreementSelected = false;
+    
+    // 모든 버튼에 이벤트 리스너 추가
+    document.addEventListener('DOMContentLoaded', function() {
+      // 위치 권한 버튼
+      const allowBtn = document.getElementById('allowBtn');
+      
+      // mousedown 이벤트 (데스크톱)
+      allowBtn.addEventListener('mousedown', function() {
+        toggleButton('allowBtn');
+      });
+      
+      // touchstart 이벤트 (모바일)
+      allowBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // 기본 터치 동작 방지
+        toggleButton('allowBtn');
+      });
+      
+      // 개인정보 동의 버튼들
+      const disagreeBtn = document.getElementById('disagreeBtn');
+      const agreeBtn = document.getElementById('agreeBtn');
+      
+      // 비동의 버튼
+      disagreeBtn.addEventListener('mousedown', function() {
+        toggleButton('disagreeBtn');
+      });
+      
+      disagreeBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        toggleButton('disagreeBtn');
+      });
+      
+      // 동의 버튼
+      agreeBtn.addEventListener('mousedown', function() {
+        toggleButton('agreeBtn');
+      });
+      
+      agreeBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        toggleButton('agreeBtn');
+      });
+    });
     
     // 버튼 클릭 시 스타일 변경 함수
     function toggleButton(buttonId) {
