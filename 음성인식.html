@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8"> <title>음성 인식 원본</title>
+<style>
+    body { text-align: center; }
+    button { font-size: 1.2em; padding: 0px 15px 0px; }
+    h1 { background: yellow; }
+    h3 { font-size: 1.3em; color: blue; }
+    h4 { color: red; }
+    h5 { color: green; }
+</style>
+</head>
+
+<body>
+<h3>음성을 텍스트로 변환하기</h3>
+<button id="startButton">시작</button>
+<h1 id="output">여기에 인식된 텍스트가 표시됩니다.</h1>
+<h4 id="count"></h4>
+<h5 id="sLength"></h5>
+<script>
+    const output = document.getElementById("output");
+    const count = document.getElementById("count");
+    const sLength = document.getElementById("sLength");
+    let c = 0;
+    // 음성 인식을지원하는지확인
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("이 브라우저는 음성인식을지원하지않습니다."); 
+    }
+    else {
+            const recognition = new SpeechRecognition(); /* SpeechRecognition 객체생성*/
+            recognition.lang = 'ko-KR'; // 언어설정
+            document.getElementById("startButton").onclick = () => {     /* 클릭이벤트*/
+                recognition.start();
+                output.textContent = "..."; // 음성인식중 변환
+            };
+            recognition.onresult = (event) => {    /* 음성인식결과보여줌  */      
+                output.textContent = event.results[0][0].transcript;            
+            };
+            recognition.onerror = (event) => {   /* 오류처리*/
+                console.error("오류가발생했습니다:", event.error);
+                output.textContent = "오류가발생했습니다: " + event.error;
+            };
+            recognition.onend = () => {     /* 인식끝날때마다*/
+                console.log("음성인식이종료되었습니다.");
+                
+                // 금지어 사용시 알림
+                if(output.textContent.indexOf("바보") != -1 || output.textContent.indexOf("메롱") != -1) alert("[주의] 금지어가 포함되어 있습니다.");
+                
+                c++;
+                count.textContent = c + "회";
+                sLength.textContent = "글자수(공백제외) = " + output.textContent.split(' ').join('').length;;
+            };
+        }
+    </script>
+</body></html>
