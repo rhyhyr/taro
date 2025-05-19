@@ -8,9 +8,9 @@
 </head>
 <body>
   <div class="container">
-    <!-- 입력 텍스트 표시 영역 -->
+    <!-- 음성 인식 결과 표시 영역 -->
     <div class="input-display" id="inputDisplay">
-      <!-- 여기에 입력 텍스트가 표시됩니다 -->
+      <!-- 여기에 음성 인식 결과가 표시됩니다 -->
     </div>
     
     <!-- 확인 텍스트 -->
@@ -43,10 +43,11 @@
       if (isConfirmed) {
         alert('확인되었습니다.');
         // 여기에 확인 후 처리 로직 추가
+        // 예: 다음 페이지로 이동
+        // window.location.href = 'next-page.html';
       } else {
         alert('취소되었습니다.');
-        // 여기에 취소 후 처리 로직 추가
-        // 예: 이전 페이지로 돌아가기
+        // 이전 페이지(음성 인식 페이지)로 돌아가기
         window.history.back();
       }
     }
