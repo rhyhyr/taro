@@ -26,15 +26,15 @@
   <script>
     // 페이지 로드 시 실행
     document.addEventListener('DOMContentLoaded', function() {
-      // 로컬 스토리지에서 음성 인식 결과 가져오기
-      const recognizedText = localStorage.getItem('recognizedText');
+      // 로컬 스토리지에서 입력 텍스트 가져오기
+      const inputText = localStorage.getItem('userInputText');
       const inputDisplay = document.getElementById('inputDisplay');
       
-      // 음성 인식 결과가 있으면 표시
-      if (recognizedText) {
-        inputDisplay.textContent = recognizedText;
+      // 입력 텍스트가 있으면 표시
+      if (inputText) {
+        inputDisplay.textContent = inputText;
       } else {
-        inputDisplay.textContent = '음성 인식 결과가 없습니다';
+        inputDisplay.textContent = '입력된 텍스트가 없습니다';
       }
     });
 
