@@ -121,6 +121,10 @@
       // 전송 버튼 클릭 이벤트
       sendButton.addEventListener('click', () => {
         if (messageInput.value.trim() !== '') {
+          // 입력된 텍스트를 localStorage에 저장
+          localStorage.setItem('userInputText', messageInput.value);
+          
+          // 확인 페이지로 이동
           window.location.href = 'confirm.html';
         }
       });
