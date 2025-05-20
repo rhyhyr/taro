@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tago api Test</title>
+  <script src="https://topopentile1.tmap.co.kr/scriptSDKV2/tmapjs2.min.js?version=20231206"></script>
+</head>
+<body>
+    <div id="result">로딩 중...</div>
+    <div id="map_div"></div>
+  <script>
+    var options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0,
+    };
+
+    // 사용자 위치를 얻는 함수
+    function getUserLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error, options);
+      } else {
+        document.getElementById("result").innerText = "이 브라우저는 위치 정보를 지원하지 않습니다.";
+      }
+    }
+
+    // 위치 획득 성공 시 호출되는 함수
+    function success(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+        
+      // 지도 표시
+      var map = new Tmapv2.Map("map_div", {
+        center: new Tmapv2.LatLng(latitude, longitude),
+        width: "400px",
+        height: "400px",
+        zoom: 14
+    });
+
+      var xhr = new XMLHttpRequest();
+      var url = 'http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getCrdntPrxmtSttnList';
+      var queryParams = '?serviceKey=AkitlNBJDUtLzeFfwjIH1dYllDkQN70sg4eveRlW8Vz8E6C3OCL%2Bh%2F4bn6SB0CK2cw9H8LoWgzzkp9njYDw7mA%3D%3D';
+      queryParams += '&gpsLati=' + latitude;
+      queryParams += '&gpsLong=' + longitude;
+      queryParams += '&_type=json';
+      queryParams += '&numOfRows=3';
+      queryParams += '&pageNo=1';
+
+      xhr.open('GET', url + queryParams);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var response = JSON.parse(this.responseText);
+          var items = response.response.body.items.item;
+          var resultHTML = "<h3>가까운 버스 정류장 목록</h3><ul>";
+            resultHTML += "<li><strong>latitude:</strong>" + latitude + "<strong>longitude:</strong>" + longitude +" </li>";
+          items.forEach(function(item) {
+            resultHTML += "<li><strong>정류소 ID:</strong> " + item.nodeid + " | <strong>정류소명:</strong> " + item.nodenm + "</li>";
+          });
+          resultHTML += "</ul>";
+          document.getElementById("result").innerHTML = resultHTML;
+        }
+      };
+      xhr.send();
+    }
+
+    // 위치 획득 실패 시 호출되는 함수
+    function error(err) {
+      document.getElementById("result").innerText = "위치 정보를 가져올 수 없습니다. (" + err.message + ")";
+    }
+
+    // 페이지 로딩 후 위치 요청
+    getUserLocation();
+  </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tago api Test</title>
+</head>
+<body>
+  <h2>정류장 검색</h2>
+  <input type="text" id="stopNameInput" placeholder="정류장 이름 입력" />
+  <button onclick="handleSearch()">검색</button>
+
+  <div id="result"></div>
+
+<script>
+  const serviceKey = 'AkitlNBJDUtLzeFfwjIH1dYllDkQN70sg4eveRlW8Vz8E6C3OCL%2Bh%2F4bn6SB0CK2cw9H8LoWgzzkp9njYDw7mA%3D%3D';
+
+  // 검색 버튼 클릭 시 실행
+  function handleSearch() {
+    const stopName = document.getElementById("stopNameInput").value.trim();
+    if (stopName) {
+      fetchBusStop(stopName);
+    } else {
+      alert("정류장 이름을 입력해주세요.");
+    }
+  }
+
+  // 정류소 조회
+  function fetchBusStop(bstopnm) {
+    const url = `http://apis.data.go.kr/6260000/BusanBIMS/busStopList?serviceKey=${serviceKey}&numOfRows=5&pageNo=1&bstopnm=${encodeURIComponent(bstopnm)}`;
+
+    fetch(url)
+      .then(response => response.text())
+      .then(xmlString => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+        const items = xmlDoc.getElementsByTagName("item");
+
+        let resultHTML = "";
+        if (items.length === 0) {
+          resultHTML = "<p>검색된 정류장이 없습니다.</p>";
+        } else {
+          Array.from(items).forEach(item => {
+            const bstopid = getText(item, "bstopid");
+            const bstopnm = getText(item, "bstopnm");
+
+            const containerId = `stop-${bstopid}`;
+            resultHTML += `
+              <div id="${containerId}" style="border:1px solid #ccc; margin:10px; padding:10px;">
+                <h3>정류소명: ${bstopnm} (ID: ${bstopid})</h3>
+                <div class="arrival">로딩 중...</div>
+              </div>
+            `;
+
+            fetchArrivalInfo(bstopid, containerId);
+          });
+        }
+
+        document.getElementById("result").innerHTML = resultHTML;
+      })
+      .catch(err => {
+        document.getElementById("result").innerText = "정류소 정보를 불러오는 중 오류 발생: " + err;
+      });
+  }
+
+  // 버스 도착 정보 조회
+  function fetchArrivalInfo(bstopid, containerId) {
+    const url = `http://apis.data.go.kr/6260000/BusanBIMS/stopArrByBstopid?bstopid=${bstopid}&serviceKey=${serviceKey}`;
+
+    fetch(url)
+      .then(response => response.text())
+      .then(xmlString => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+        const items = xmlDoc.getElementsByTagName("item");
+
+        let resultHTML = "<ul>";
+        Array.from(items).forEach(item => {
+          const bustype = getText(item, "bustype");
+          const bstopidx = getText(item, "bstopidx");
+          const lineno = getText(item, "lineno");
+          const carno1 = getText(item, "carno1");
+          const carno2 = getText(item, "carno2");
+          const min1 = getText(item, "min1");
+          const min2 = getText(item, "min2");
+
+          resultHTML += `
+            <li>
+              <strong>bstopid:</strong> ${bstopid} |
+              <strong>노선:</strong> ${lineno} | 
+              <strong>버스종류:</strong> ${bustype} | 
+              <strong>차량1:</strong> ${carno1} (약 ${min1}분 후 도착) |
+              <strong>차량2:</strong> ${carno2} (약 ${min2}분 후 도착)
+            </li>`;
+        });
+        resultHTML += "</ul>";
+
+        const container = document.querySelector(`#${containerId} .arrival`);
+        container.innerHTML = resultHTML || "도착 정보 없음";
+      })
+      .catch(err => {
+        const container = document.querySelector(`#${containerId} .arrival`);
+        container.innerText = "도착 정보 오류: " + err;
+      });
+  }
+
+  // 텍스트 추출 유틸
+  function getText(parent, tagName) {
+    const el = parent.getElementsByTagName(tagName)[0];
+    return el ? el.textContent : "정보 없음";
+  }
+</script>
+</body>
+</html>
