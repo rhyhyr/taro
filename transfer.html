@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>대중교통 환승 정보</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .bus-position {
+      transition: transform 0.5s ease-in-out, left 0.5s ease-in-out;
+    }
+    
+    .progress-dot {
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+  </style>
 </head>
 <body class="bg-white flex flex-col items-center min-h-screen p-4">
   <div class="max-w-md w-full">
@@ -15,18 +24,18 @@
     
     <!-- 진행 상태 표시 -->
     <div class="relative mb-8 px-4">
-      <!-- 버스 이모지 (좌측 동그라미 위) -->
-      <div class="absolute -top-8 left-0" style="left: calc(0% - 12px);">
+      <!-- 버스 이모지 (이동 가능) -->
+      <div class="absolute -top-8 bus-position" id="busIcon" style="left: calc(0% - 12px);">
         <span class="text-2xl">🚌</span>
       </div>
       
       <!-- 진행 상태 점들 -->
       <div class="flex items-center justify-between">
-        <div class="w-4 h-4 rounded-full bg-black"></div>
+        <div class="w-4 h-4 rounded-full bg-black progress-dot" id="dot1"></div>
         <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white"></div>
+        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot" id="dot2"></div>
         <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white"></div>
+        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot" id="dot3"></div>
       </div>
     </div>
     
@@ -81,6 +90,9 @@
   </div>
 
   <script>
+    // 현재 진행 단계 (1, 2, 3)
+    let currentStep = 1;
+    
     // 데이터를 설정하는 함수들
     
     /**
@@ -131,7 +143,10 @@
       document.getElementById('totalTime').textContent = time + '분';
     }
     
-    // 버스 아이콘 위치 이동 함수
+    /**
+     * 버스 이모지 위치 이동 함수
+     * @param {number} step - 이동할 단계 (1, 2, 3)
+     */
     function moveBusIcon(step) {
       const busIcon = document.getElementById('busIcon');
       const positions = [
@@ -144,8 +159,11 @@
         busIcon.style.left = positions[step - 1];
       }
     }
-
-    // 진행 상태 점 업데이트 함수
+    
+    /**
+     * 진행 상태 점 업데이트 함수
+     * @param {number} step - 현재 단계 (1, 2, 3)
+     */
     function updateProgressDots(step) {
       const dots = ['dot1', 'dot2', 'dot3'];
       
@@ -161,35 +179,55 @@
         }
       });
     }
-
+    
+    // 버튼 이벤트 리스너들
+    
+    // 듣기 버튼 클릭 이벤트
+    document.getElementById('listenBtn').addEventListener('click', function() {
+      console.log('듣기 버튼이 클릭되었습니다.');
+      // 여기에 음성 안내 기능을 구현할 수 있습니다.
+      alert('음성 안내를 시작합니다.');
+    });
+    
     // 환승 버튼 클릭 이벤트
     document.getElementById('transferBtn').addEventListener('click', function() {
+      console.log('환승 버튼이 클릭되었습니다.');
+      
+      // 다음 단계로 이동 (최대 3단계까지)
       if (currentStep < 3) {
         currentStep++;
+        
+        // 버스 이모지 이동 및 진행 상태 업데이트
         moveBusIcon(currentStep);
         updateProgressDots(currentStep);
         
-        // 단계별 메시지 업데이트 (선택사항)
+        // 단계별 메시지 (선택사항)
         if (currentStep === 2) {
           console.log('환승 중...');
         } else if (currentStep === 3) {
           console.log('목적지 도착!');
         }
+      } else {
+        alert('이미 최종 목적지에 도착했습니다.');
       }
     });
-
+    
     // 경로 보기 버튼 클릭 이벤트
     document.getElementById('viewRouteBtn').addEventListener('click', function() {
-
+      console.log('경로 보기 버튼이 클릭되었습니다.');
       // 다음 페이지로 이동
       window.location.href = 'route.html';
     });
-
-    // 예시: 페이지 로드 시 기본값 설정
+    
+    // 페이지 로드 시 기본값 설정 또는 URL 파라미터에서 데이터 가져오기
     window.addEventListener('DOMContentLoaded', function() {
       // URL 파라미터에서 데이터 가져오기
       const urlParams = new URLSearchParams(window.location.search);
-@@ -189,10 +166,6 @@
+      
+      // 파라미터가 있으면 해당 값 사용, 없으면 기본값 사용
+      setCurrentStation(urlParams.get('station') || '하단역');
+      setBusNumber(urlParams.get('bus') || '1001');
+      setDestination(urlParams.get('dest') || '부산 역');
       setDistanceTime(urlParams.get('distance') || '0');
       setFasterTime(urlParams.get('faster') || '0');
       setTotalTime(urlParams.get('total') || '51');
@@ -200,3 +238,4 @@
     });
   </script>
 </body>
+</html>
