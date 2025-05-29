@@ -17,19 +17,16 @@
 </head>
 <body class="bg-white flex flex-col items-center min-h-screen p-4">
   <div class="max-w-md w-full">
-    <!-- 상단 시간 및 진행 상태 -->
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-2">
-        <img src="/images/bus-icon.png" alt="버스" class="h-6 w-6">
-        <span class="text-xl font-bold" id="totalTime">51분</span>
-      </div>
+    <!-- 상단 시간 표시 -->
+    <div class="flex items-center justify-end mb-4 pr-4">
+      <span class="text-xl font-bold" id="totalTime">51분</span>
     </div>
     
     <!-- 진행 상태 표시 -->
     <div class="relative mb-8 px-4">
-      <!-- 버스 아이콘 (이동 가능) -->
+      <!-- 버스 이모티콘 (이동 가능) -->
       <div class="absolute -top-8 bus-position" id="busIcon" style="left: calc(0% - 12px);">
-        <img src="/images/bus-icon.png" alt="버스" class="h-6 w-6">
+        <img src="/images/bus-emoji.png" alt="🚌" class="h-6 w-6">
       </div>
       
       <!-- 진행 상태 점들 -->
@@ -127,7 +124,7 @@
       document.getElementById('totalTime').textContent = time + '분';
     }
     
-    // 버스 아이콘 위치 이동 함수
+    // 버스 이모티콘 위치 이동 함수
     function moveBusIcon(step) {
       const busIcon = document.getElementById('busIcon');
       const positions = [
