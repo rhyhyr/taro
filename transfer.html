@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대중교통 환승 정보</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white flex flex-col items-center min-h-screen p-4">
+  <div class="max-w-md w-full">
+    <!-- 상단 시간 및 진행 상태 -->
+    <div class="flex items-center justify-between mb-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 17h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"></path>
+        <path d="M4 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"></path>
+        <rect x="6" y="9" width="12" height="10" rx="2"></rect>
+        <circle cx="8" cy="19" r="1"></circle>
+        <circle cx="16" cy="19" r="1"></circle>
+      </svg>
+      <span class="text-xl font-bold" id="totalTime">51분</span>
+    </div>
+    
+    <!-- 진행 상태 표시 -->
+    <div class="flex items-center justify-between mb-8 px-4">
+      <div class="w-4 h-4 rounded-full bg-black"></div>
+      <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+      <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white"></div>
+      <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+      <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white"></div>
+    </div>
+    
+    <!-- 현재 위치 정보 -->
+    <div class="text-center mb-8">
+      <p class="text-lg">[ 현재 <span id="currentStation">하단역</span> ]</p>
+    </div>
+    
+    <!-- 승차 정보 -->
+    <div class="text-center mb-4">
+      <p class="text-3xl font-bold">
+        <span class="text-red-600" id="busNumber">1001번</span> 승차
+      </p>
+    </div>
+    
+    <!-- 하차 정보 -->
+    <div class="text-center mb-8">
+      <p class="text-2xl font-bold">
+        <span id="destination">부산 역</span> 하차
+      </p>
+    </div>
+    
+    <!-- 버튼 영역 -->
+    <div class="flex gap-4 mb-8">
+      <button class="flex-1 py-4 border border-blue-500 rounded-md text-blue-500 font-medium">
+        듣기
+      </button>
+      <button class="flex-1 py-4 bg-blue-500 rounded-md text-white font-medium">
+        환승
+      </button>
+    </div>
+    
+    <!-- 안내 메시지 -->
+    <div class="text-center mb-4">
+      <p class="text-lg">하차 후, 환승 누르세요</p>
+    </div>
+    
+    <!-- 경로 정보 -->
+    <div class="text-center mb-4">
+      <p class="text-gray-500">
+        <span id="distanceTime">0분</span> 거리에
+        <span id="fasterTime">0분</span> 빠른 경로가 존재합니다.
+      </p>
+    </div>
+    
+    <!-- 경로 보기 버튼 -->
+    <div class="text-center">
+      <button id="viewRouteBtn" class="text-blue-500 border-b border-blue-500 pb-1">
+        경로 보기
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 데이터를 설정하는 함수들
+    
+    // 현재 역 설정 함수
+    function setCurrentStation(station) {
+      document.getElementById('currentStation').textContent = station;
+    }
+    
+    // 버스 번호 설정 함수
+    function setBusNumber(number) {
+      document.getElementById('busNumber').textContent = number + '번';
+    }
+    
+    // 목적지 설정 함수
+    function setDestination(dest) {
+      document.getElementById('destination').textContent = dest;
+    }
+    
+    // 거리 시간 설정 함수
+    function setDistanceTime(time) {
+      document.getElementById('distanceTime').textContent = time + '분';
+    }
+    
+    // 더 빠른 시간 설정 함수
+    function setFasterTime(time) {
+      document.getElementById('fasterTime').textContent = time + '분';
+    }
+    
+    // 총 소요 시간 설정 함수
+    function setTotalTime(time) {
+      document.getElementById('totalTime').textContent = time + '분';
+    }
+    
+    // 경로 보기 버튼 클릭 이벤트
+    document.getElementById('viewRouteBtn').addEventListener('click', function() {
+      // 다음 페이지로 이동
+      window.location.href = 'route.html';
+    });
+    
+    // 예시: 페이지 로드 시 기본값 설정
+    window.addEventListener('DOMContentLoaded', function() {
+      // URL 파라미터에서 데이터 가져오기
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // 파라미터가 있으면 해당 값 사용, 없으면 기본값 사용
+      setCurrentStation(urlParams.get('station') || '하단역');
+      setBusNumber(urlParams.get('bus') || '1001');
+      setDestination(urlParams.get('dest') || '부산 역');
+      setDistanceTime(urlParams.get('distance') || '0');
+      setFasterTime(urlParams.get('faster') || '0');
+      setTotalTime(urlParams.get('total') || '51');
+    });
+  </script>
+</body>
+</html>
