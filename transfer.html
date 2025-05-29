@@ -18,12 +18,12 @@
 <body class="bg-white flex flex-col items-center min-h-screen p-4">
   <div class="max-w-md w-full">
     <!-- 상단 시간 표시 -->
-    <div class="flex items-center justify-end mb-2 pr-4">
+    <div class="flex items-center justify-end mb-7 pr-4">
       <span class="text-xl font-bold" id="totalTime">51분</span>
     </div>
     
     <!-- 진행 상태 표시 -->
-    <div class="relative mb-6 px-4">
+    <div class="relative mb-11 px-4">
       <!-- 버스 아이콘 (이동 가능) -->
       <div class="absolute -top-6 bus-position" id="busIcon" style="left: calc(0% - 12px);">
         <span class="text-2xl">🚌</span>
@@ -40,26 +40,26 @@
     </div>
     
     <!-- 현재 위치 정보 -->
-    <div class="text-center mb-8">
+    <div class="text-center mb-13">
       <p class="text-lg">[ 현재 <span id="currentStation">하단역</span> ]</p>
     </div>
     
     <!-- 승차 정보 -->
-    <div class="text-center mb-4">
+    <div class="text-center mb-9">
       <p class="text-3xl font-bold">
         <span class="text-red-600" id="busNumber">1001번</span> 승차
       </p>
     </div>
     
     <!-- 하차 정보 -->
-    <div class="text-center mb-8">
+    <div class="text-center mb-13">
       <p class="text-2xl font-bold">
         <span id="destination">부산 역</span> 하차
       </p>
     </div>
     
     <!-- 버튼 영역 -->
-    <div class="flex gap-4 mb-12">
+    <div class="flex gap-4 mb-17">
       <button class="flex-1 py-4 border border-blue-500 rounded-md text-blue-500 font-medium">
         듣기
       </button>
@@ -69,12 +69,12 @@
     </div>
     
     <!-- 안내 메시지 -->
-    <div class="text-center mb-4">
+    <div class="text-center mb-9">
       <p class="text-lg">하차 후, 환승 누르세요</p>
     </div>
     
     <!-- 경로 정보 -->
-    <div class="text-center mb-4">
+    <div class="text-center mb-9">
       <p class="text-gray-500">
         <span id="distanceTime">0분</span> 거리에
         <span id="fasterTime">0분</span> 빠른 경로가 존재합니다.
