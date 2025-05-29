@@ -131,42 +131,72 @@
       document.getElementById('totalTime').textContent = time + '분';
     }
     
-    // 버튼 이벤트 리스너들
-    
-    // 듣기 버튼 클릭 이벤트
-    document.getElementById('listenBtn').addEventListener('click', function() {
-      console.log('듣기 버튼이 클릭되었습니다.');
-      // 여기에 음성 안내 기능을 구현할 수 있습니다.
-      alert('음성 안내를 시작합니다.');
-    });
-    
+    // 버스 아이콘 위치 이동 함수
+    function moveBusIcon(step) {
+      const busIcon = document.getElementById('busIcon');
+      const positions = [
+        'calc(0% - 12px)',    // 첫 번째 점
+        'calc(50% - 12px)',   // 두 번째 점
+        'calc(100% - 12px)'   // 세 번째 점
+      ];
+      
+      if (step >= 1 && step <= 3) {
+        busIcon.style.left = positions[step - 1];
+      }
+    }
+
+    // 진행 상태 점 업데이트 함수
+    function updateProgressDots(step) {
+      const dots = ['dot1', 'dot2', 'dot3'];
+      
+      // 모든 점을 초기 상태로 리셋
+      dots.forEach((dotId, index) => {
+        const dot = document.getElementById(dotId);
+        if (index < step) {
+          // 현재 단계 이전의 점들은 검은색으로
+          dot.className = 'w-4 h-4 rounded-full bg-black progress-dot';
+        } else {
+          // 현재 단계 이후의 점들은 흰색 테두리로
+          dot.className = 'w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot';
+        }
+      });
+    }
+
     // 환승 버튼 클릭 이벤트
     document.getElementById('transferBtn').addEventListener('click', function() {
-      console.log('환승 버튼이 클릭되었습니다.');
-      // 여기에 환승 관련 기능을 구현할 수 있습니다.
-      alert('환승 정보를 확인합니다.');
+      if (currentStep < 3) {
+        currentStep++;
+        moveBusIcon(currentStep);
+        updateProgressDots(currentStep);
+        
+        // 단계별 메시지 업데이트 (선택사항)
+        if (currentStep === 2) {
+          console.log('환승 중...');
+        } else if (currentStep === 3) {
+          console.log('목적지 도착!');
+        }
+      }
     });
-    
+
     // 경로 보기 버튼 클릭 이벤트
     document.getElementById('viewRouteBtn').addEventListener('click', function() {
-      console.log('경로 보기 버튼이 클릭되었습니다.');
+
       // 다음 페이지로 이동
       window.location.href = 'route.html';
     });
-    
-    // 페이지 로드 시 기본값 설정 또는 URL 파라미터에서 데이터 가져오기
+
+    // 예시: 페이지 로드 시 기본값 설정
     window.addEventListener('DOMContentLoaded', function() {
       // URL 파라미터에서 데이터 가져오기
       const urlParams = new URLSearchParams(window.location.search);
-      
-      // 파라미터가 있으면 해당 값 사용, 없으면 기본값 사용
-      setCurrentStation(urlParams.get('station') || '하단역');
-      setBusNumber(urlParams.get('bus') || '1001');
-      setDestination(urlParams.get('dest') || '부산 역');
+@@ -189,10 +166,6 @@
       setDistanceTime(urlParams.get('distance') || '0');
       setFasterTime(urlParams.get('faster') || '0');
       setTotalTime(urlParams.get('total') || '51');
+      
+      // 초기 진행 상태 설정
+      moveBusIcon(currentStep);
+      updateProgressDots(currentStep);
     });
   </script>
 </body>
-</html>
