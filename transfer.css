@@ -1,0 +1,167 @@
+/* 기본 스타일 초기화 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.container {
+  max-width: 28rem;
+  width: 100%;
+}
+
+/* 상단 시간 및 진행 상태 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.bus-icon {
+  height: 2rem;
+  width: 2rem;
+}
+
+.total-time {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* 진행 상태 표시 */
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.progress-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  background-color: white;
+}
+
+.progress-dot.active {
+  background-color: black;
+  border: none;
+}
+
+.progress-line {
+  flex: 1;
+  height: 0.125rem;
+  background-color: #d1d5db;
+  margin: 0 0.5rem;
+}
+
+/* 현재 위치 정보 */
+.current-location {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.current-location p {
+  font-size: 1.125rem;
+}
+
+/* 승차 정보 */
+.bus-info {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.bus-info p {
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+.bus-number {
+  color: #dc2626;
+}
+
+/* 하차 정보 */
+.destination-info {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.destination-info p {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* 버튼 영역 */
+.button-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.listen-button {
+  flex: 1;
+  padding: 1rem 0;
+  border: 1px solid #3b82f6;
+  border-radius: 0.375rem;
+  color: #3b82f6;
+  font-weight: 500;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.transfer-button {
+  flex: 1;
+  padding: 1rem 0;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 0.375rem;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 안내 메시지 */
+.instruction {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.instruction p {
+  font-size: 1.125rem;
+}
+
+/* 경로 정보 */
+.route-info {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.route-info p {
+  color: #6b7280;
+}
+
+/* 경로 보기 버튼 */
+.view-route {
+  text-align: center;
+}
+
+.view-route button {
+  color: #3b82f6;
+  border: none;
+  border-bottom: 1px solid #3b82f6;
+  background-color: transparent;
+  padding-bottom: 0.25rem;
+  cursor: pointer;
+}
