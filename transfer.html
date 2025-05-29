@@ -5,28 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>대중교통 환승 정보</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .bus-position {
+      transition: transform 0.5s ease-in-out;
+    }
+    
+    .progress-dot {
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+  </style>
 </head>
 <body class="bg-white flex flex-col items-center min-h-screen p-4">
   <div class="max-w-md w-full">
     <!-- 상단 시간 및 진행 상태 -->
-    <div class="flex items-center justify-between mb-8">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 17h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"></path>
-        <path d="M4 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"></path>
-        <rect x="6" y="9" width="12" height="10" rx="2"></rect>
-        <circle cx="8" cy="19" r="1"></circle>
-        <circle cx="16" cy="19" r="1"></circle>
-      </svg>
-      <span class="text-xl font-bold" id="totalTime">51분</span>
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <img src="/images/bus-icon.png" alt="버스" class="h-6 w-6">
+        <span class="text-xl font-bold" id="totalTime">51분</span>
+      </div>
     </div>
     
     <!-- 진행 상태 표시 -->
-    <div class="flex items-center justify-between mb-8 px-4">
-      <div class="w-4 h-4 rounded-full bg-black"></div>
-      <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-      <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white"></div>
-      <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-      <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white"></div>
+    <div class="relative mb-8 px-4">
+      <!-- 버스 아이콘 (이동 가능) -->
+      <div class="absolute -top-8 bus-position" id="busIcon" style="left: calc(0% - 12px);">
+        <img src="/images/bus-icon.png" alt="버스" class="h-6 w-6">
+      </div>
+      
+      <!-- 진행 상태 점들 -->
+      <div class="flex items-center justify-between">
+        <div class="w-4 h-4 rounded-full bg-black progress-dot" id="dot1"></div>
+        <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot" id="dot2"></div>
+        <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot" id="dot3"></div>
+      </div>
     </div>
     
     <!-- 현재 위치 정보 -->
@@ -53,7 +66,7 @@
       <button class="flex-1 py-4 border border-blue-500 rounded-md text-blue-500 font-medium">
         듣기
       </button>
-      <button class="flex-1 py-4 bg-blue-500 rounded-md text-white font-medium">
+      <button id="transferBtn" class="flex-1 py-4 bg-blue-500 rounded-md text-white font-medium">
         환승
       </button>
     </div>
@@ -80,6 +93,8 @@
   </div>
 
   <script>
+    let currentStep = 1; // 현재 진행 단계 (1, 2, 3)
+    
     // 데이터를 설정하는 함수들
     
     // 현재 역 설정 함수
@@ -112,6 +127,53 @@
       document.getElementById('totalTime').textContent = time + '분';
     }
     
+    // 버스 아이콘 위치 이동 함수
+    function moveBusIcon(step) {
+      const busIcon = document.getElementById('busIcon');
+      const positions = [
+        'calc(0% - 12px)',    // 첫 번째 점
+        'calc(50% - 12px)',   // 두 번째 점
+        'calc(100% - 12px)'   // 세 번째 점
+      ];
+      
+      if (step >= 1 && step <= 3) {
+        busIcon.style.left = positions[step - 1];
+      }
+    }
+    
+    // 진행 상태 점 업데이트 함수
+    function updateProgressDots(step) {
+      const dots = ['dot1', 'dot2', 'dot3'];
+      
+      // 모든 점을 초기 상태로 리셋
+      dots.forEach((dotId, index) => {
+        const dot = document.getElementById(dotId);
+        if (index < step) {
+          // 현재 단계 이전의 점들은 검은색으로
+          dot.className = 'w-4 h-4 rounded-full bg-black progress-dot';
+        } else {
+          // 현재 단계 이후의 점들은 흰색 테두리로
+          dot.className = 'w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot';
+        }
+      });
+    }
+    
+    // 환승 버튼 클릭 이벤트
+    document.getElementById('transferBtn').addEventListener('click', function() {
+      if (currentStep < 3) {
+        currentStep++;
+        moveBusIcon(currentStep);
+        updateProgressDots(currentStep);
+        
+        // 단계별 메시지 업데이트 (선택사항)
+        if (currentStep === 2) {
+          console.log('환승 중...');
+        } else if (currentStep === 3) {
+          console.log('목적지 도착!');
+        }
+      }
+    });
+    
     // 경로 보기 버튼 클릭 이벤트
     document.getElementById('viewRouteBtn').addEventListener('click', function() {
       // 다음 페이지로 이동
@@ -130,6 +192,10 @@
       setDistanceTime(urlParams.get('distance') || '0');
       setFasterTime(urlParams.get('faster') || '0');
       setTotalTime(urlParams.get('total') || '51');
+      
+      // 초기 진행 상태 설정
+      moveBusIcon(currentStep);
+      updateProgressDots(currentStep);
     });
   </script>
 </body>
