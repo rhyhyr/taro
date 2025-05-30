@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대중교통 환승 정보</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .bus-position {
+      transition: transform 0.5s ease-in-out, left 0.5s ease-in-out;
+    }
+    
+    .progress-dot {
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-white flex flex-col items-center min-h-screen p-4">
+  <div class="max-w-md w-full">
+    <!-- 상단 시간 표시 -->
+    <div class="flex items-center justify-end mb-4">
+      <span class="text-xl font-bold" id="totalTime">51분</span>
+    </div>
+    
+    <!-- 진행 상태 표시 -->
+    <div class="relative mb-8 px-4">
+      <!-- 버스 이모지 (이동 가능) -->
+      <div class="absolute -top-8 bus-position" id="busIcon" style="left: calc(0% - 12px);">
+        <span class="text-2xl">🚌</span>
+      </div>
+      
+      <!-- 진행 상태 점들 -->
+      <div class="flex items-center justify-between">
+        <div class="w-4 h-4 rounded-full bg-black progress-dot" id="dot1"></div>
+        <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot" id="dot2"></div>
+        <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+        <div class="w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot" id="dot3"></div>
+      </div>
+    </div>
+    
+    <!-- 현재 위치 정보 -->
+    <div class="text-center mb-8">
+      <p class="text-lg">[ 현재 <span id="currentStation">하단역</span> ]</p>
+    </div>
+    
+    <!-- 승차 정보 -->
+    <div class="text-center mb-4">
+      <p class="text-3xl font-bold">
+        <span class="text-red-600" id="busNumber">1001번</span> 승차
+      </p>
+    </div>
+    
+    <!-- 하차 정보 -->
+    <div class="text-center mb-8">
+      <p class="text-2xl font-bold">
+        <span id="destination">부산 역</span> 하차
+      </p>
+    </div>
+    
+    <!-- 버튼 영역 -->
+    <div class="flex gap-4 mb-8">
+      <button id="listenBtn" class="flex-1 py-4 border border-blue-500 rounded-md text-blue-500 font-medium hover:bg-blue-50 transition-colors">
+        듣기
+      </button>
+      <button id="transferBtn" class="flex-1 py-4 bg-blue-500 rounded-md text-white font-medium hover:bg-blue-600 transition-colors">
+        환승
+      </button>
+    </div>
+    
+    <!-- 안내 메시지 -->
+    <div class="text-center mb-4">
+      <p class="text-lg">하차 후, 환승 누르세요</p>
+    </div>
+    
+    <!-- 경로 정보 -->
+    <div class="text-center mb-4">
+      <p class="text-gray-500">
+        <span id="distanceTime">0분</span> 거리에
+        <span id="fasterTime">0분</span> 빠른 경로가 존재합니다.
+      </p>
+    </div>
+    
+    <!-- 경로 보기 버튼 -->
+    <div class="text-center">
+      <button id="viewRouteBtn" class="text-blue-500 border-b border-blue-500 pb-1 hover:text-blue-600 transition-colors">
+        경로 보기
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 현재 진행 단계 (1, 2, 3)
+    let currentStep = 1;
+    
+    // 데이터를 설정하는 함수들
+    
+    /**
+     * 현재 역 이름을 설정하는 함수
+     * @param {string} station - 현재 역 이름 (예: "하단역")
+     */
+    function setCurrentStation(station) {
+      document.getElementById('currentStation').textContent = station;
+    }
+    
+    /**
+     * 버스 번호를 설정하는 함수
+     * @param {string|number} number - 버스 번호 (예: "1001" 또는 1001)
+     */
+    function setBusNumber(number) {
+      document.getElementById('busNumber').textContent = number + '번';
+    }
+    
+    /**
+     * 목적지(하차 역)를 설정하는 함수
+     * @param {string} dest - 목적지 이름 (예: "부산 역")
+     */
+    function setDestination(dest) {
+      document.getElementById('destination').textContent = dest;
+    }
+    
+    /**
+     * 거리에 해당하는 시간을 설정하는 함수
+     * @param {string|number} time - 시간(분) (예: "0" 또는 0)
+     */
+    function setDistanceTime(time) {
+      document.getElementById('distanceTime').textContent = time + '분';
+    }
+    
+    /**
+     * 더 빠른 경로의 시간을 설정하는 함수
+     * @param {string|number} time - 시간(분) (예: "0" 또는 0)
+     */
+    function setFasterTime(time) {
+      document.getElementById('fasterTime').textContent = time + '분';
+    }
+    
+    /**
+     * 총 소요 시간을 설정하는 함수
+     * @param {string|number} time - 시간(분) (예: "51" 또는 51)
+     */
+    function setTotalTime(time) {
+      document.getElementById('totalTime').textContent = time + '분';
+    }
+    
+    /**
+     * 버스 이모지 위치 이동 함수
+     * @param {number} step - 이동할 단계 (1, 2, 3)
+     */
+    function moveBusIcon(step) {
+      const busIcon = document.getElementById('busIcon');
+      const positions = [
+        'calc(0% - 12px)',    // 첫 번째 점
+        'calc(50% - 12px)',   // 두 번째 점
+        'calc(100% - 12px)'   // 세 번째 점
+      ];
+      
+      if (step >= 1 && step <= 3) {
+        busIcon.style.left = positions[step - 1];
+      }
+    }
+    
+    /**
+     * 진행 상태 점 업데이트 함수
+     * @param {number} step - 현재 단계 (1, 2, 3)
+     */
+    function updateProgressDots(step) {
+      const dots = ['dot1', 'dot2', 'dot3'];
+      
+      // 모든 점을 초기 상태로 리셋
+      dots.forEach((dotId, index) => {
+        const dot = document.getElementById(dotId);
+        if (index < step) {
+          // 현재 단계 이전의 점들은 검은색으로
+          dot.className = 'w-4 h-4 rounded-full bg-black progress-dot';
+        } else {
+          // 현재 단계 이후의 점들은 흰색 테두리로
+          dot.className = 'w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot';
+        }
+      });
+    }
+    
+    // 버튼 이벤트 리스너들
+    
+    // 듣기 버튼 클릭 이벤트
+    document.getElementById('listenBtn').addEventListener('click', function() {
+      console.log('듣기 버튼이 클릭되었습니다.');
+      // 여기에 음성 안내 기능을 구현할 수 있습니다.
+      alert('음성 안내를 시작합니다.');
+    });
+    
+    // 환승 버튼 클릭 이벤트
+    document.getElementById('transferBtn').addEventListener('click', function() {
+      console.log('환승 버튼이 클릭되었습니다.');
+      
+      // 다음 단계로 이동 (최대 3단계까지)
+      if (currentStep < 3) {
+        currentStep++;
+        
+        // 버스 이모지 이동 및 진행 상태 업데이트
+        moveBusIcon(currentStep);
+        updateProgressDots(currentStep);
+        
+        // 단계별 메시지 (선택사항)
+        if (currentStep === 2) {
+          console.log('환승 중...');
+        } else if (currentStep === 3) {
+          console.log('목적지 도착!');
+        }
+      } else {
+        alert('이미 최종 목적지에 도착했습니다.');
+      }
+    });
+    
+    // 경로 보기 버튼 클릭 이벤트
+    document.getElementById('viewRouteBtn').addEventListener('click', function() {
+      console.log('경로 보기 버튼이 클릭되었습니다.');
+      // 다음 페이지로 이동
+      window.location.href = 'route.html';
+    });
+    
+    // 페이지 로드 시 기본값 설정 또는 URL 파라미터에서 데이터 가져오기
+    window.addEventListener('DOMContentLoaded', function() {
+      // URL 파라미터에서 데이터 가져오기
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // 파라미터가 있으면 해당 값 사용, 없으면 기본값 사용
+      setCurrentStation(urlParams.get('station') || '하단역');
+      setBusNumber(urlParams.get('bus') || '1001');
+      setDestination(urlParams.get('dest') || '부산 역');
+      setDistanceTime(urlParams.get('distance') || '0');
+      setFasterTime(urlParams.get('faster') || '0');
+      setTotalTime(urlParams.get('total') || '51');
+      
+      // 초기 진행 상태 설정
+      moveBusIcon(currentStep);
+      updateProgressDots(currentStep);
+    });
+  </script>
+</body>
+</html>

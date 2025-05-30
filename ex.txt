@@ -1,0 +1,69 @@
+# 데이터 설정 함수들
+
+1. **setCurrentStation(station)**
+
+1. 현재 역 이름을 설정
+2. 매개변수: `station` (문자열) - 현재 역 이름
+3. 예시: `setCurrentStation('하단역')`
+
+
+
+2. **setBusNumber(number)**
+
+1. 버스 번호를 설정
+2. 매개변수: `number` (문자열 또는 숫자) - 버스 번호
+3. 예시: `setBusNumber('1001')` 또는 `setBusNumber(1001)`
+
+
+
+3. **setDestination(dest)**
+
+1. 목적지(하차 역)를 설정
+2. 매개변수: `dest` (문자열) - 목적지 이름
+3. 예시: `setDestination('부산 역')`
+
+
+
+4. **setDistanceTime(time)**
+
+1. 거리에 해당하는 시간을 설정
+2. 매개변수: `time` (문자열 또는 숫자) - 시간(분)
+3. 예시: `setDistanceTime('0')` 또는 `setDistanceTime(0)`
+
+
+
+5. **setFasterTime(time)**
+
+1. 더 빠른 경로의 시간을 설정
+2. 매개변수: `time` (문자열 또는 숫자) - 시간(분)
+3. 예시: `setFasterTime('0')` 또는 `setFasterTime(0)`
+
+
+
+6. **setTotalTime(time)**
+
+1. 총 소요 시간을 설정
+2. 매개변수: `time` (문자열 또는 숫자) - 시간(분)
+3. 예시: `setTotalTime('51')` 또는 `setTotalTime(51)`
+
+
+
+# 사용 방법
+
+1. **URL 파라미터로 데이터 전달:**
+
+```javascript
+window.location.href = 'index.html?station=하단역&bus=1001&dest=부산 역&distance=0&faster=0&total=51';
+```
+
+
+2. **JavaScript로 직접 함수 호출:**
+
+```javascript
+setCurrentStation('하단역');
+setBusNumber('1001');
+setDestination('부산 역');
+setDistanceTime(0);
+setFasterTime(0);
+setTotalTime(51);
+```
