@@ -1,0 +1,193 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>권한 및 동의 화면</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .btn-active {
+      background-color: white !important;
+      color: #0080ff !important;
+      border: 2px solid #0080ff !important;
+    }
+  </style>
+</head>
+<body class="bg-white flex flex-col items-center min-h-screen">
+  <!-- 위치 권한 섹션 -->
+  <div class="flex flex-col items-center mt-32 mb-16 w-full px-6">
+    <p class="text-lg font-medium text-center mb-6">위치 권한을 허용 하시겠습니까?</p>
+    <div class="flex justify-center w-full">
+      <button id="allowBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium">
+        허용
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 개인정보 동의 섹션 -->
+  <div class="flex flex-col items-center mb-16 w-full px-6">
+    <p class="text-base font-medium text-center mb-6">개인정보 제 3자 제공에 동의합니다.</p>
+    <div class="flex gap-4 w-full max-w-xs justify-center">
+      <button id="disagreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium">
+        비동의
+      </button>
+      <button id="agreeBtn" class="w-32 py-3 px-4 rounded-md bg-blue-500 text-white font-medium">
+        동의
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 각 섹션의 선택 상태를 저장하는 변수
+    let locationPermissionSelected = false;
+    let privacyAgreementSelected = false;
+    
+    // 시작 위치정보 변수
+    let startCoords;
+
+    // 모든 버튼에 이벤트 리스너 추가
+    document.addEventListener('DOMContentLoaded', function() {
+      // 위치 권한 버튼
+      const allowBtn = document.getElementById('allowBtn');
+
+      // mousedown 이벤트 (데스크톱)
+      allowBtn.addEventListener('mousedown', function() {
+        toggleButton('allowBtn');        
+        
+        navigator.geolocation?.getCurrentPosition(
+  		  pos => {
+  		    startCoords = {
+  		      x: pos.coords.longitude,
+  		      y: pos.coords.latitude
+  		    };
+  		    console.log('현재 위치:', startCoords);
+  		  },
+  		  err => {
+  		    console.error('위치 정보를 가져올 수 없습니다.', err);
+  		    alert('위치 정보를 가져올 수 없습니다.');
+  		  },
+  		  {
+  		    enableHighAccuracy: true,  // 🔥 고정밀 GPS 사용
+  		    timeout: 10000,            // 최대 대기 시간 (ms)
+  		    maximumAge: 0              // 캐시된 위치 정보 사용 안 함
+  		  }
+  		);
+      });
+      // touchstart 이벤트 (모바일)
+      allowBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // 기본 터치 동작 방지
+        toggleButton('allowBtn');
+        
+     	// 현재 위치 설정
+        navigator.geolocation?.getCurrentPosition(
+          pos => {
+            startCoords = {
+              x: pos.coords.longitude,
+              y: pos.coords.latitude
+            };
+            console.log('현재 위치:', startCoords);
+          },
+          () => alert('위치 정보를 가져올 수 없습니다.')
+        );
+      });
+
+
+
+      // 개인정보 동의 버튼들
+      const disagreeBtn = document.getElementById('disagreeBtn');
+      const agreeBtn = document.getElementById('agreeBtn');
+
+
+
+
+      // 비동의 버튼
+      disagreeBtn.addEventListener('mousedown', function() {
+        toggleButton('disagreeBtn');
+      });
+      
+      disagreeBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        toggleButton('disagreeBtn');
+      });
+
+      // 동의 버튼
+      agreeBtn.addEventListener('mousedown', function() {
+        toggleButton('agreeBtn');
+      });
+
+      agreeBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        toggleButton('agreeBtn');
+
+
+      });
+    });
+
+    // 버튼 클릭 시 스타일 변경 함수
+    function toggleButton(buttonId) {
+      const button = document.getElementById(buttonId);
+      
+      // 버튼 스타일 토글
+      if (button.classList.contains('btn-active')) {
+        button.classList.remove('btn-active');
+        
+        // 상태 업데이트
+        if (buttonId === 'allowBtn') {
+          locationPermissionSelected = false;
+        } else {
+          privacyAgreementSelected = false;
+        }
+      } else {
+        button.classList.add('btn-active');
+        
+        // 상태 업데이트
+        if (buttonId === 'allowBtn') {
+          locationPermissionSelected = true;
+        } else {
+          privacyAgreementSelected = true;
+        }
+      }
+      
+      // 개인정보 동의 섹션에서는 한 버튼만 활성화되도록 함
+      if (buttonId === 'disagreeBtn' || buttonId === 'agreeBtn') {
+        const otherButtonId = buttonId === 'disagreeBtn' ? 'agreeBtn' : 'disagreeBtn';
+        const otherButton = document.getElementById(otherButtonId);
+
+
+
+        // 다른 버튼이 활성화되어 있으면 비활성화
+        if (otherButton.classList.contains('btn-active')) {
+          otherButton.classList.remove('btn-active');
+        }
+
+      }
+      
+      // 두 섹션 모두 선택되었는지 확인하고 다음 페이지로 이동
+      checkAndNavigate();
+    }
+
+    // 두 섹션 모두 선택되었는지 확인하고 다음 페이지로 이동하는 함수
+    function checkAndNavigate() {
+  	if (locationPermissionSelected && privacyAgreementSelected && startCoords?.x && startCoords?.y) {
+    // 1. 좌표를 백엔드에 비동기로 전송
+    fetch("/test", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(startCoords)
+    })
+    .then(response => {
+      if (response.ok) {
+        // 2. 전송 완료 후 start.html로 이동
+        window.location.href = "/start";
+      } else {
+        alert("좌표 전송 실패");
+      }
+    });
+  }
+}
+
+
+  </script>
+</body>
+</html>

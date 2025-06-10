@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>위치 확인</title>
+  <link rel="stylesheet" href="confirm.css">
+</head>
+<body>
+  <div class="container">
+    <!-- 음성 인식 결과 표시 영역 -->
+    <div class="input-display" id="inputDisplay">
+      <!-- 여기에 음성 인식 결과가 표시됩니다 -->
+    </div>
+    
+    <!-- 확인 텍스트 -->
+    <p class="confirmation-text">이 장소가 맞나요?</p>
+    
+    <!-- 확인 버튼 -->
+    <div class="button-container">
+      <button class="confirm-button" onclick="handleConfirm(true)">예</button>
+      <button class="confirm-button" onclick="handleConfirm(false)">아니오</button>
+    </div>
+  </div>
+
+  <script>
+    // 페이지 로드 시 실행
+    document.addEventListener('DOMContentLoaded', function() {
+      // 로컬 스토리지에서 입력 텍스트 가져오기
+      const inputText = localStorage.getItem('userInputText');
+      const inputDisplay = document.getElementById('inputDisplay');
+      
+      // 입력 텍스트가 있으면 표시
+      if (inputText) {
+        inputDisplay.textContent = inputText;
+      } else {
+        inputDisplay.textContent = '입력된 텍스트가 없습니다';
+      }
+    });
+
+    // 확인/취소 버튼 처리
+    function handleConfirm(isConfirmed) {
+      if (isConfirmed) {
+        alert('확인되었습니다.');
+        // 여기에 확인 후 처리 로직 추가
+        // 예: 다음 페이지로 이동
+        window.location.href = '/test';
+      } else {
+        alert('취소되었습니다.');
+        // 이전 페이지(음성 인식 페이지)로 돌아가기
+        window.history.back();
+      }
+    }
+  </script>
+</body>
+</html>
