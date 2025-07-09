@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대중교통 환승 정보</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .bus-position {
+      transition: transform 0.5s ease-in-out, left 0.5s ease-in-out;
+    }
+    .progress-dot {
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-white flex flex-col items-center min-h-screen p-4">
+  <div class="max-w-md w-full">
+    <div class="flex items-center justify-end mb-10"> <span class="text-xl font-bold" id="totalTime">0분</span>
+    </div>
+    <div class="relative mb-14 px-4"> <div class="absolute -top-8 bus-position" id="busIcon" style="left: calc(0% - 12px);">
+        <span class="text-2xl">🚌</span>
+      </div>
+      <div class="flex items-center justify-between" id="progressContainer"></div>
+    </div>
+    <div class="text-center mb-14"> <p id="walkInstruction"></p>
+    </div>
+    <div class="text-center mb-14" id="busInfo"> <p class="text-3xl font-bold">
+        <span id="busNumber">-</span> 승차
+      </p>
+    </div>
+    <div class="text-center mb-14" id="destInfo"> <p class="text-2xl font-bold">
+        <span id="destination">-</span> 하차
+      </p>
+    </div>
+    <div class="flex gap-4 mb-14" id="buttonGroup"> <button id="listenBtn" class="flex-1 py-4 border border-blue-500 rounded-md text-blue-500 font-medium hover:bg-blue-50 transition-colors">듣기</button>
+      <button id="transferBtn" class="flex-1 py-4 bg-blue-500 rounded-md text-white font-medium hover:bg-blue-600 transition-colors">환승</button>
+    </div>
+    <div class="text-center mb-10"> <p id="transferInstruction" class="text-lg">하차 후, 환승 누르세요</p>
+    </div>
+    <div class="text-center mb-10"> <p class="text-gray-500">
+        <span id="distanceTime">0분</span> 거리에
+        <span id="fasterTime">0분</span> 빠른 경로가 존재합니다.
+      </p>
+    </div>
+    <div class="w-full flex justify-center mt-10"> <button id="viewRouteBtn" class="text-blue-500 border-b border-blue-500 pb-1 hover:text-blue-600 transition-colors">경로 보기</button>
+    </div>
+  </div>
+  
+<script src="/api.js"></script>
+<script th:inline="javascript">
+let currentStep = 0;
+let routeSteps = [];
+let recommendedSteps = [];
+let bestTotalPath = null; // 최적 경로 전체 객체를 저장할 변수 추가
+let recommendedTotalPath = null; // 추천 경로 전체 객체를 저장할 변수 추가
+let bestTotalTime = 0;
+let recommendedTime = 0;
+let isShowingRecommendedRoute = false; // 현재 추천 경로를 보여주는지 여부를 추적
+
+//배포된 Cloud Function의 URL
+const TTS_FUNCTION_URL = 'https://asia-northeast3-taro-461003.cloudfunctions.net/googleTts';
+
+
+function setCurrentStation(station, isWalk = false) {
+  const el = document.getElementById('walkInstruction');
+  if (isWalk) {
+    el.innerHTML = `<p class='text-2xl font-bold text-blue-700'>${station}</p>`;
+  } else {
+    el.innerHTML = `<p class='text-lg font-bold text-xl'>현재 <span id='currentStation'>${station}</span></p>`;
+  }
+}
+
+// busType 매개변수 추가
+function setBusNumber(number, busType) {
+  const busNumberSpan = document.getElementById('busNumber');
+  busNumberSpan.textContent = number + '번';
+  
+  // 모든 가능한 색상 클래스 및 관련된 클래스 제거
+  busNumberSpan.classList.remove('text-blue-600', 'text-red-600', 'text-green-600', 'text-gray-900', 'bus-number-color');
+
+  // bustype에 따라 색상 클래스 추가
+  switch (busType) {
+    case '일반버스':
+      busNumberSpan.classList.add('text-blue-600'); // 파란색
+      break;
+    case '급행버스':
+    case '심야버스(급행)':
+      busNumberSpan.classList.add('text-red-600'); // 빨간색
+      break;
+    case '마을버스':
+      busNumberSpan.classList.add('text-green-600'); // 초록색
+      break;
+    default:
+      busNumberSpan.classList.add('text-gray-900'); // 기본 색상 (검정)
+      break;
+  }
+}
+function setDestination(dest) {
+  document.getElementById('destination').textContent = dest;
+}
+function setTotalTime(time) {
+  document.getElementById('totalTime').textContent = time + '분';
+}
+function moveBusIcon(step) {
+  const busIcon = document.getElementById('busIcon');
+  const dots = document.querySelectorAll('.progress-dot');
+  if (dots.length < 2) return;
+  const percent = (step - 1) / (dots.length - 1) * 100;
+  busIcon.style.left = `calc(${percent}% - 12px)`;
+}
+function updateProgressDots(step) {
+  const dots = document.querySelectorAll('.progress-dot');
+  dots.forEach((dot, index) => {
+    if (index < step) {
+      dot.className = 'w-4 h-4 rounded-full bg-black progress-dot';
+    } else {
+      dot.className = 'w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot';
+    }
+  });
+}
+function setupDots(count) {
+  const container = document.getElementById('progressContainer');
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'w-4 h-4 rounded-full border-2 border-gray-300 bg-white progress-dot';
+    dot.id = `dot${i}`;
+    container.appendChild(dot);
+    if (i < count - 1) {
+      const bar = document.createElement('div');
+      bar.className = 'flex-1 h-0.5 bg-gray-300 mx-2';
+      container.appendChild(bar);
+    }
+  }
+  updateProgressDots(1);
+}
+
+function renderStep(step) {
+  if (step >= routeSteps.length) return;
+  const sub = routeSteps[step];
+  currentStep = step;
+  updateProgressDots(step + 1);
+
+  if (sub.trafficType === 2) { // 버스
+	  setCurrentStation(sub.startName);
+	  setDestination(sub.endName);
+	  setBusNumber(sub.lane[0].busNo, sub.busType); 
+	  document.getElementById('busInfo').style.display = 'block';
+	  document.getElementById('destInfo').style.display = 'block';
+	  document.getElementById('listenBtn').style.display = 'inline-block';
+
+	  // 환승 버튼 원래대로
+	  const transferBtn = document.getElementById('transferBtn');
+	  transferBtn.classList.remove('w-full');
+	  transferBtn.classList.add('flex-1');
+
+	} else if (sub.trafficType === 3) { // 도보
+	  const next = routeSteps[step + 1];
+	  setCurrentStation(`${sub.distance}m 거리에 있는 ${next?.startName || '다음 정류장'}로 가세요.`, true);
+	  document.getElementById('busInfo').style.display = 'none';
+	  document.getElementById('destInfo').style.display = 'none';
+	  document.getElementById('listenBtn').style.display = 'none';
+
+	  // 환승 버튼 가운데 정렬
+	  const transferBtn = document.getElementById('transferBtn');
+	  transferBtn.classList.remove('flex-1');
+	  transferBtn.classList.add('w-full');
+	}
+
+
+  // 환승 버튼과 관련 메시지 가시성 관리
+  const transferInstruction = document.getElementById('transferInstruction');
+  if (currentStep === routeSteps.length - 1) {
+    document.getElementById('transferBtn').style.display = 'none';
+    if (transferInstruction) {
+      transferInstruction.style.display = 'none'; // "하차 후, 환승 누르세요" 메시지 숨김
+    }
+  } else {
+    document.getElementById('transferBtn').style.display = 'block';
+    if (transferInstruction) {
+      transferInstruction.style.display = 'block';
+    }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const startx = /*[[${startx}]]*/ 0;
+  const starty = /*[[${starty}]]*/ 0;
+  const endx = /*[[${x}]]*/ 0;
+  const endy = /*[[${y}]]*/ 0;
+  
+  // api key 값
+  // ODsay_ip, ODsay_url
+  const odsayKey = ODsay_ip;
+  const busanServiceKey = Busan;
+
+  const url = `https://api.odsay.com/v1/api/searchPubTransPathT?SX=${startx}&SY=${starty}&EX=${endx}&EY=${endy}&SearchPathType=2&apiKey=${odsayKey}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  console.log(data);
+
+  const paths = data.result?.path?.slice(0, 4);
+  const busArrivalCache = new Map();
+
+  const scoredPaths = await Promise.all(paths.map(async (path) => {
+    let walkTime = 0, transfers = path.info.busTransitCount, minArrival = Infinity;
+    let isValid = true;
+    let subPathsWithBusType = []; 
+
+    for (const sub of path.subPath) {
+      if (sub.trafficType === 3) {
+        walkTime += sub.sectionTime;
+        subPathsWithBusType.push(sub); 
+      } else if (sub.trafficType === 2) {
+        const busNo = sub.lane[0].busNo;
+        const stationId = sub.startLocalStationID;
+        const cacheKey = `${stationId}_${busNo}`;
+        let arrivalData; 
+
+        if (busArrivalCache.has(cacheKey)) {
+          arrivalData = busArrivalCache.get(cacheKey);
+        } else {
+          arrivalData = await getMinArrivalTime(stationId, busNo, busanServiceKey);
+          busArrivalCache.set(cacheKey, arrivalData);
+        }
+
+        // arrivalData가 null이거나 min1이 null인 경우 유효하지 않음으로 처리
+        if (arrivalData === null || arrivalData.min1 === null) {
+          isValid = false;
+          break; 
+        }
+        
+        // sub 객체에 busType 정보 추가 (spread 연산자로 기존 sub 속성 유지)
+        subPathsWithBusType.push({ ...sub, busType: arrivalData.busType }); 
+
+        if (arrivalData.min1 < minArrival) minArrival = arrivalData.min1;
+      }
+    }
+    return {
+      path: { ...path, subPath: subPathsWithBusType }, 
+      walkTime, transfers, minArrival, totalTime: path.info.totalTime, isValid
+    };
+  }));
+
+  const validPaths = scoredPaths.filter(p => p.isValid);
+  if (validPaths.length === 0) {
+    alert("도착 정보가 있는 유효한 경로가 없습니다.");
+    return;
+  }
+
+  const best = validPaths.sort((a, b) => {
+	    if (a.transfers !== b.transfers) return a.transfers - b.transfers;
+	    if (a.walkTime !== b.walkTime) return a.walkTime - b.walkTime;
+	    return a.minArrival - b.minArrival;
+  })[0];
+
+  const fastest = validPaths.reduce((a, b) => a.totalTime < b.totalTime ? a : b, validPaths[0]);
+  const showRecommended = fastest.path.info.totalTime !== best.path.info.totalTime && fastest.path.info.totalTime < best.path.info.totalTime;
+
+  bestTotalTime = best.totalTime;
+  bestTotalPath = best.path; 
+  if (showRecommended) {
+    recommendedSteps = fastest.path.subPath;
+    recommendedTime = fastest.totalTime;
+    recommendedTotalPath = fastest.path; 
+    document.getElementById("distanceTime").textContent = `${recommendedSteps[0]?.distance || 0}m`; 
+    document.getElementById("fasterTime").textContent = `${best.totalTime - fastest.totalTime}분`;
+    document.querySelector('.text-gray-500').style.display = 'block'; 
+    document.getElementById("viewRouteBtn").style.display = 'block'; 
+  } else {
+    document.querySelector('.text-gray-500').style.display = 'none'; 
+    document.getElementById("viewRouteBtn").style.display = 'none'; 
+  }
+
+  applyRoute(best.path);
+});
+
+document.getElementById('viewRouteBtn').addEventListener('click', () => {
+  const recommendationTextContainer = document.querySelector('.text-gray-500');
+  const viewRouteBtn = document.getElementById('viewRouteBtn');
+  const transferInstruction = document.getElementById('transferInstruction');
+
+  if (!isShowingRecommendedRoute) { 
+    if (recommendedTotalPath) { 
+      applyRoute(recommendedTotalPath);
+      isShowingRecommendedRoute = true;
+      viewRouteBtn.textContent = '이전 경로'; 
+      recommendationTextContainer.style.display = 'block';
+      recommendationTextContainer.textContent = `${bestTotalTime - recommendedTime}분 빠른 경로로 변경되었습니다.`;
+    } else {
+      alert('더 빠른 추천 경로가 없습니다.');
+    }
+  } else { 
+    if (bestTotalPath) { 
+      applyRoute(bestTotalPath);
+      isShowingRecommendedRoute = false;
+      viewRouteBtn.textContent = '경로 보기'; 
+      if (recommendedTotalPath && bestTotalTime > recommendedTime) { 
+        document.getElementById("distanceTime").textContent = `${recommendedTotalPath.subPath[0]?.distance || 0}m`; 
+        document.getElementById("fasterTime").textContent = `${bestTotalTime - recommendedTime}분`;
+        recommendationTextContainer.innerHTML = `<span id="distanceTime">${recommendedTotalPath.subPath[0]?.distance || 0}m</span> 거리에 <span id="fasterTime">${bestTotalTime - recommendedTime}분</span> 빠른 경로가 존재합니다.`;
+        recommendationTextContainer.style.display = 'block';
+      } else { 
+        recommendationTextContainer.style.display = 'none';
+        viewRouteBtn.style.display = 'none'; 
+      }
+    } else {
+      alert('이전 경로 정보를 찾을 수 없습니다.');
+    }
+  }
+});
+
+
+document.getElementById('transferBtn').addEventListener('click', () => {
+  const transferInstruction = document.getElementById('transferInstruction');
+  if (currentStep < routeSteps.length - 1) {
+    renderStep(currentStep + 1);
+    moveBusIcon(currentStep + 1);
+    document.querySelector('.text-gray-500').style.display = 'none';
+    document.getElementById("viewRouteBtn").style.display = 'none';
+  } else {
+    alert("모든 환승이 완료되었습니다.");
+    document.getElementById('transferBtn').style.display = 'none';
+    if (transferInstruction) {
+      transferInstruction.style.display = 'none'; 
+    }
+    document.querySelector('.text-gray-500').style.display = 'none';
+    document.getElementById("viewRouteBtn").style.display = 'none';
+  }
+});
+
+function getMinArrivalTime(stationId, busNo, serviceKey) {
+  const url = `https://apis.data.go.kr/6260000/BusanBIMS/stopArrByBstopid?bstopid=${stationId}&serviceKey=${serviceKey}`;
+  return fetch(url)
+    .then(res => res.text())
+    .then(xmlStr => {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlStr, "application/xml");
+      const items = [...xml.getElementsByTagName("item")];
+      const match = items.find(item => getText(item, "lineno") === busNo);
+      
+      if (!match) return null; 
+
+      const min1 = parseInt(getText(match, "min1"));
+      const busType = getText(match, "bustype"); 
+      console.log("버스 번호:", busNo, "버스 타입:", busType);
+
+
+      return isNaN(min1) ? null : { min1: min1, busType: busType }; 
+    }).catch(() => null);
+}
+
+function getText(parent, tagName) {
+  const el = parent.getElementsByTagName(tagName)[0];
+  return el ? el.textContent : "정보 없음";
+}
+
+//듣기 버튼 클릭 이벤트
+document.getElementById('listenBtn').addEventListener('click', async function() {
+  this.disabled = true;
+  this.textContent = '음성 생성 중...';
+
+  const station = document.getElementById('currentStation').textContent;
+  const bus = document.getElementById('busNumber').textContent;
+  const dest = document.getElementById('destination').textContent;
+  const textToSpeak = `현재 정류장은 ${station}입니다. ${bus}을 탑승 후 ${dest}에서 하차하세요.`;
+
+  console.log('음성 변환 요청:', textToSpeak);
+
+  try {
+    const response = await fetch(TTS_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: textToSpeak }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`서버 오류: ${response.status}`);
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    audio.play();
+
+    audio.onended = () => {
+      this.disabled = false;
+      this.textContent = '듣기';
+      URL.revokeObjectURL(audioUrl);
+    };
+
+  } catch (error) {
+    console.error('TTS 기능 오류:', error);
+    alert('음성을 생성하는 데 실패했습니다.');
+    this.disabled = false;
+    this.textContent = '듣기';
+  }
+});
+
+function applyRoute(path) {
+	  let filteredSubPaths = [...path.subPath];
+
+	  // 1. 마지막 도보 구간 제거
+	  if (filteredSubPaths.length > 0 && filteredSubPaths[filteredSubPaths.length - 1].trafficType === 3) {
+	    filteredSubPaths.pop();
+	  }
+
+	  // 2. 거리 3 이하의 도보 구간 제거
+	  filteredSubPaths = filteredSubPaths.filter(sub =>
+	    !(sub.trafficType === 3 && sub.distance <= 3)
+	  );
+
+	  setTotalTime(path.info.totalTime);
+	  routeSteps = filteredSubPaths;
+	  setupDots(routeSteps.length);
+	  renderStep(0);
+
+	  const transferInstruction = document.getElementById('transferInstruction');
+	  if (routeSteps.length > 0 && currentStep < routeSteps.length - 1) {
+	    document.getElementById('transferBtn').style.display = 'block';
+	    if (transferInstruction) {
+	      transferInstruction.style.display = 'block';
+	    }
+	  } else {
+	    document.getElementById('transferBtn').style.display = 'none';
+	    if (transferInstruction) {
+	      transferInstruction.style.display = 'none';
+	    }
+	  }
+	}
+
+</script>
+</body>
+</html>
