@@ -94,6 +94,8 @@
       $.get('https://apis.openapi.sk.com/tmap/pois', {
         version: 1,
         searchKeyword: inputText.trim(),
+        areaLLCode : '26',
+      	areaLMCode: '000',
         resCoordType: 'WGS84GEO',
         reqCoordType: 'WGS84GEO',
         count: 20,

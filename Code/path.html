@@ -13,10 +13,79 @@
     .progress-dot {
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
+    /* 로딩 오버레이 스타일 */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #f9f9f9;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: sans-serif;
+    }
+
+    .bus-container {
+      position: relative;
+      width: 100vw;
+      height: 120px; /* 버스 애니메이션 컨테이너 높이 증가 (100px -> 120px) */
+      overflow: hidden;
+    }
+
+    .bus-animation {
+      font-size: 80px; /* 버스 아이콘 크기 유지 */
+      position: absolute;
+      top: 0; /* 상단에서 시작 */
+      left: 0;
+      animation: moveBus 2s linear infinite;
+      display: flex;
+      align-items: center;
+      /* 버스 아이콘이 컨테이너의 중앙에 오도록 약간 조정 */
+      transform: translateY(10px); 
+    }
+
+    .bus-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @keyframes moveBus {
+      0%   { left: -100px; opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { left: 100vw; opacity: 0; }
+    }
+
+    #loadingText {
+      margin-top: 50px;
+      font-size: 36px;
+      color: #555;
+      text-align: center;
+    }
+
+    /* mainContent를 기존 body의 flexbox 아이템으로 유지 */
+    #mainContent {
+      display: none; /* 초기에는 숨김 */
+    }
   </style>
 </head>
 <body class="bg-white flex flex-col items-center min-h-screen p-4">
-  <div class="max-w-md w-full">
+
+  <div id="loadingOverlay">
+    <div class="bus-container">
+      <div class="bus-animation">
+        <span class="bus-icon">🚌</span>
+      </div>
+    </div>
+    <div id="loadingText">경로를 찾고 있습니다...</div>
+  </div>
+
+  <div id="mainContent" class="max-w-md w-full">
     <div class="flex items-center justify-end mb-10"> <span class="text-xl font-bold" id="totalTime">0분</span>
     </div>
     <div class="relative mb-14 px-4"> <div class="absolute -top-8 bus-position" id="busIcon" style="left: calc(0% - 12px);">
@@ -186,6 +255,10 @@ function renderStep(step) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
+  // 로딩 오버레이 표시
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  document.getElementById('mainContent').style.display = 'none';
+
   const startx = /*[[${startx}]]*/ 0;
   const starty = /*[[${starty}]]*/ 0;
   const endx = /*[[${x}]]*/ 0;
@@ -247,6 +320,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const validPaths = scoredPaths.filter(p => p.isValid);
   if (validPaths.length === 0) {
     alert("도착 정보가 있는 유효한 경로가 없습니다.");
+    // 경로가 없을 때 로딩 오버레이 숨기고 본문 표시
+    document.getElementById('loadingOverlay').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block'; 
     return;
   }
 
@@ -275,6 +351,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   applyRoute(best.path);
+
+  // 모든 작업 완료 후 로딩 오버레이 숨기고 본문 표시
+  document.getElementById('loadingOverlay').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block'; 
 });
 
 document.getElementById('viewRouteBtn').addEventListener('click', () => {
