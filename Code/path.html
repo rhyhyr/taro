@@ -9,6 +9,8 @@
   <style>
     .bus-position {
       transition: transform 0.5s ease-in-out, left 0.5s ease-in-out;
+      /* 아이콘 너비의 절반만큼 왼쪽으로 이동하여 중앙에 위치시킴 */
+      transform: translateX(-50%);
     }
     .progress-dot {
       transition: background-color 0.3s ease, border-color 0.3s ease;
@@ -32,20 +34,19 @@
     .bus-container {
       position: relative;
       width: 100vw;
-      height: 120px; /* 버스 애니메이션 컨테이너 높이 증가 (100px -> 120px) */
+      height: 120px;
       overflow: hidden;
     }
 
     .bus-animation {
-      font-size: 80px; /* 버스 아이콘 크기 유지 */
+      font-size: 80px;
       position: absolute;
-      top: 0; /* 상단에서 시작 */
+      top: 0;
       left: 0;
       animation: moveBus 2s linear infinite;
       display: flex;
       align-items: center;
-      /* 버스 아이콘이 컨테이너의 중앙에 오도록 약간 조정 */
-      transform: translateY(10px); 
+      transform: translateY(10px);
     }
 
     .bus-icon {
@@ -70,7 +71,7 @@
 
     /* mainContent를 기존 body의 flexbox 아이템으로 유지 */
     #mainContent {
-      display: none; /* 초기에는 숨김 */
+      display: none;
     }
   </style>
 </head>
@@ -82,13 +83,14 @@
         <span class="bus-icon">🚌</span>
       </div>
     </div>
-    <div id="loadingText">경로를 찾고 있습니다...</div>
+    <div id="loadingText">버스를 불러오고 있습니다...</div>
   </div>
 
   <div id="mainContent" class="max-w-md w-full">
     <div class="flex items-center justify-end mb-10"> <span class="text-xl font-bold" id="totalTime">0분</span>
     </div>
-    <div class="relative mb-14 px-4"> <div class="absolute -top-8 bus-position" id="busIcon" style="left: calc(0% - 12px);">
+    <div class="relative mb-14 px-4">
+      <div class="absolute -top-8 bus-position" id="busIcon">
         <span class="text-2xl">🚌</span>
       </div>
       <div class="flex items-center justify-between" id="progressContainer"></div>
@@ -122,15 +124,13 @@
 let currentStep = 0;
 let routeSteps = [];
 let recommendedSteps = [];
-let bestTotalPath = null; // 최적 경로 전체 객체를 저장할 변수 추가
-let recommendedTotalPath = null; // 추천 경로 전체 객체를 저장할 변수 추가
+let bestTotalPath = null;
+let recommendedTotalPath = null;
 let bestTotalTime = 0;
 let recommendedTime = 0;
-let isShowingRecommendedRoute = false; // 현재 추천 경로를 보여주는지 여부를 추적
+let isShowingRecommendedRoute = false;
 
-//배포된 Cloud Function의 URL
 const TTS_FUNCTION_URL = 'https://asia-northeast3-taro-461003.cloudfunctions.net/googleTts';
-
 
 function setCurrentStation(station, isWalk = false) {
   const el = document.getElementById('walkInstruction');
@@ -141,28 +141,25 @@ function setCurrentStation(station, isWalk = false) {
   }
 }
 
-// busType 매개변수 추가
 function setBusNumber(number, busType) {
   const busNumberSpan = document.getElementById('busNumber');
   busNumberSpan.textContent = number + '번';
   
-  // 모든 가능한 색상 클래스 및 관련된 클래스 제거
   busNumberSpan.classList.remove('text-blue-600', 'text-red-600', 'text-green-600', 'text-gray-900', 'bus-number-color');
 
-  // bustype에 따라 색상 클래스 추가
   switch (busType) {
     case '일반버스':
-      busNumberSpan.classList.add('text-blue-600'); // 파란색
+      busNumberSpan.classList.add('text-blue-600');
       break;
     case '급행버스':
     case '심야버스(급행)':
-      busNumberSpan.classList.add('text-red-600'); // 빨간색
+      busNumberSpan.classList.add('text-red-600');
       break;
     case '마을버스':
-      busNumberSpan.classList.add('text-green-600'); // 초록색
+      busNumberSpan.classList.add('text-green-600');
       break;
     default:
-      busNumberSpan.classList.add('text-gray-900'); // 기본 색상 (검정)
+      busNumberSpan.classList.add('text-gray-900');
       break;
   }
 }
@@ -172,13 +169,57 @@ function setDestination(dest) {
 function setTotalTime(time) {
   document.getElementById('totalTime').textContent = time + '분';
 }
+
 function moveBusIcon(step) {
   const busIcon = document.getElementById('busIcon');
   const dots = document.querySelectorAll('.progress-dot');
-  if (dots.length < 2) return;
-  const percent = (step - 1) / (dots.length - 1) * 100;
-  busIcon.style.left = `calc(${percent}% - 12px)`;
+  const progressContainer = document.getElementById('progressContainer');
+
+  if (!progressContainer || dots.length === 0) {
+    return;
+  }
+
+  const containerWidth = progressContainer.offsetWidth; // 컨테이너의 실제 너비
+  const dotWidth = 16; // w-4 in tailwind is 16px
+  const containerPadding = 16; // px-4 in tailwind is 16px (left/right padding)
+
+  let targetPixelPosition;
+
+  if (dots.length === 1) {
+    // 노드가 하나일 경우, 컨테이너 중앙에 아이콘 배치
+    targetPixelPosition = containerWidth / 2;
+  } else {
+    // 첫 번째 점의 중심 픽셀 위치
+    const firstDotCenterPx = containerPadding + (dotWidth / 2);
+    // 마지막 점의 중심 픽셀 위치
+    const lastDotCenterPx = containerWidth - containerPadding - (dotWidth / 2);
+
+    // 점들의 중심이 움직이는 전체 범위 (픽셀)
+    const totalDotCenterSpan = lastDotCenterPx - firstDotCenterPx;
+
+    // 현재 단계(step)에 따른 픽셀 위치 계산 (step은 1부터 시작)
+    targetPixelPosition = firstDotCenterPx + ((step - 1) / (dots.length - 1)) * totalDotCenterSpan;
+  }
+  
+  // 픽셀 위치를 컨테이너 너비에 대한 퍼센트로 변환
+  const finalPercent = (targetPixelPosition / containerWidth) * 100;
+
+  // 첫 번째 이동 시 애니메이션이 적용되도록 처리
+  if (!busIcon.dataset.initialPosSet) {
+    busIcon.style.transition = 'none'; // 전환 일시 비활성화
+    busIcon.style.left = `${finalPercent}%`;
+    busIcon.offsetWidth; // 강제로 브라우저 reflow 유발
+    // 전환 다시 활성화 (다음 이벤트 루프 틱에서 실행되도록 지연)
+    setTimeout(() => {
+        busIcon.style.transition = 'transform 0.5s ease-in-out, left 0.5s ease-in-out';
+    }, 0); 
+    busIcon.dataset.initialPosSet = 'true'; // 초기 위치 설정 플래그
+  } else {
+    // 이후의 모든 이동은 전환 적용
+    busIcon.style.left = `${finalPercent}%`;
+  }
 }
+
 function updateProgressDots(step) {
   const dots = document.querySelectorAll('.progress-dot');
   dots.forEach((dot, index) => {
@@ -211,6 +252,7 @@ function renderStep(step) {
   const sub = routeSteps[step];
   currentStep = step;
   updateProgressDots(step + 1);
+  moveBusIcon(currentStep + 1); // 노드 업데이트 시 버스 아이콘 위치도 업데이트
 
   if (sub.trafficType === 2) { // 버스
 	  setCurrentStation(sub.startName);
@@ -220,7 +262,6 @@ function renderStep(step) {
 	  document.getElementById('destInfo').style.display = 'block';
 	  document.getElementById('listenBtn').style.display = 'inline-block';
 
-	  // 환승 버튼 원래대로
 	  const transferBtn = document.getElementById('transferBtn');
 	  transferBtn.classList.remove('w-full');
 	  transferBtn.classList.add('flex-1');
@@ -232,19 +273,17 @@ function renderStep(step) {
 	  document.getElementById('destInfo').style.display = 'none';
 	  document.getElementById('listenBtn').style.display = 'none';
 
-	  // 환승 버튼 가운데 정렬
 	  const transferBtn = document.getElementById('transferBtn');
 	  transferBtn.classList.remove('flex-1');
 	  transferBtn.classList.add('w-full');
 	}
 
 
-  // 환승 버튼과 관련 메시지 가시성 관리
   const transferInstruction = document.getElementById('transferInstruction');
   if (currentStep === routeSteps.length - 1) {
     document.getElementById('transferBtn').style.display = 'none';
     if (transferInstruction) {
-      transferInstruction.style.display = 'none'; // "하차 후, 환승 누르세요" 메시지 숨김
+      transferInstruction.style.display = 'none';
     }
   } else {
     document.getElementById('transferBtn').style.display = 'block';
@@ -255,7 +294,6 @@ function renderStep(step) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // 로딩 오버레이 표시
   document.getElementById('loadingOverlay').style.display = 'flex';
   document.getElementById('mainContent').style.display = 'none';
 
@@ -264,8 +302,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   const endx = /*[[${x}]]*/ 0;
   const endy = /*[[${y}]]*/ 0;
   
-  // api key 값
-  // ODsay_ip, ODsay_url
   const odsayKey = ODsay_ip;
   const busanServiceKey = Busan;
 
@@ -299,13 +335,11 @@ window.addEventListener('DOMContentLoaded', async () => {
           busArrivalCache.set(cacheKey, arrivalData);
         }
 
-        // arrivalData가 null이거나 min1이 null인 경우 유효하지 않음으로 처리
         if (arrivalData === null || arrivalData.min1 === null) {
           isValid = false;
           break; 
         }
         
-        // sub 객체에 busType 정보 추가 (spread 연산자로 기존 sub 속성 유지)
         subPathsWithBusType.push({ ...sub, busType: arrivalData.busType }); 
 
         if (arrivalData.min1 < minArrival) minArrival = arrivalData.min1;
@@ -320,7 +354,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   const validPaths = scoredPaths.filter(p => p.isValid);
   if (validPaths.length === 0) {
     alert("도착 정보가 있는 유효한 경로가 없습니다.");
-    // 경로가 없을 때 로딩 오버레이 숨기고 본문 표시
     document.getElementById('loadingOverlay').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block'; 
     return;
@@ -342,7 +375,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     recommendedTime = fastest.totalTime;
     recommendedTotalPath = fastest.path; 
     document.getElementById("distanceTime").textContent = `${recommendedSteps[0]?.distance || 0}m`; 
-    document.getElementById("fasterTime").textContent = `${best.totalTime - fastest.totalTime}분`;
+    document.getElementById("fasterTime").textContent = `${bestTotalTime - fastest.totalTime}분`;
     document.querySelector('.text-gray-500').style.display = 'block'; 
     document.getElementById("viewRouteBtn").style.display = 'block'; 
   } else {
@@ -350,11 +383,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("viewRouteBtn").style.display = 'none'; 
   }
 
-  applyRoute(best.path);
-
-  // 모든 작업 완료 후 로딩 오버레이 숨기고 본문 표시
+  // 메인 콘텐츠를 보이게 한 후 applyRoute를 호출
   document.getElementById('loadingOverlay').style.display = 'none';
   document.getElementById('mainContent').style.display = 'block'; 
+  applyRoute(best.path); // 이제 mainContent가 보이는 상태에서 호출됩니다.
 });
 
 document.getElementById('viewRouteBtn').addEventListener('click', () => {
@@ -397,7 +429,6 @@ document.getElementById('transferBtn').addEventListener('click', () => {
   const transferInstruction = document.getElementById('transferInstruction');
   if (currentStep < routeSteps.length - 1) {
     renderStep(currentStep + 1);
-    moveBusIcon(currentStep + 1);
     document.querySelector('.text-gray-500').style.display = 'none';
     document.getElementById("viewRouteBtn").style.display = 'none';
   } else {
@@ -437,7 +468,6 @@ function getText(parent, tagName) {
   return el ? el.textContent : "정보 없음";
 }
 
-//듣기 버튼 클릭 이벤트
 document.getElementById('listenBtn').addEventListener('click', async function() {
   this.disabled = true;
   this.textContent = '음성 생성 중...';
@@ -482,12 +512,10 @@ document.getElementById('listenBtn').addEventListener('click', async function() 
 function applyRoute(path) {
 	  let filteredSubPaths = [...path.subPath];
 
-	  // 1. 마지막 도보 구간 제거
 	  if (filteredSubPaths.length > 0 && filteredSubPaths[filteredSubPaths.length - 1].trafficType === 3) {
 	    filteredSubPaths.pop();
 	  }
 
-	  // 2. 거리 3 이하의 도보 구간 제거
 	  filteredSubPaths = filteredSubPaths.filter(sub =>
 	    !(sub.trafficType === 3 && sub.distance <= 3)
 	  );
@@ -495,7 +523,7 @@ function applyRoute(path) {
 	  setTotalTime(path.info.totalTime);
 	  routeSteps = filteredSubPaths;
 	  setupDots(routeSteps.length);
-	  renderStep(0);
+	  renderStep(0); // 이 함수 호출 내에서 moveBusIcon(1)이 이미 호출됩니다.
 
 	  const transferInstruction = document.getElementById('transferInstruction');
 	  if (routeSteps.length > 0 && currentStep < routeSteps.length - 1) {
