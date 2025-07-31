@@ -1,0 +1,141 @@
+body {
+	font-size: 1.25em;
+}
+
+.bus-position {
+  transition: transform 0.5s ease-in-out, left 0.5s ease-in-out;
+  /* 아이콘 너비의 절반만큼 왼쪽으로 이동하여 중앙에 위치시킴 */
+  transform: translateX(-50%);
+}
+.progress-dot {
+  width: 16px; /* 점 크기 증가 */
+  height: 16px; /* 점 크기 증가 */
+  border-radius: 50%; /* 완벽한 원 */
+  /* background-color와 border-color, opacity에 transition 적용 */
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* opacity transition 제거 */
+  border-width: 0px; /* 테두리 제거 */
+  flex-shrink: 0; /* 점이 줄어들지 않도록 함 */
+  position: relative; /* z-index를 위해 필요 */
+  z-index: 1; /* 선 위에 오도록 z-index 설정 */
+}
+/* 로딩 오버레이 스타일 */
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f9f9f9;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: sans-serif;
+}
+
+.bus-container {
+  position: relative;
+  width: 100vw;
+  height: 120px;
+  overflow: hidden;
+}
+
+.bus-animation {
+  font-size: 80px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: moveBus 2s linear infinite;
+  display: flex;
+  align-items: center;
+  transform: translateY(10px);
+}
+
+.bus-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes moveBus {
+  0%   { left: -100px; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: 100vw; opacity: 0; }
+}
+
+#loadingText {
+  margin-top: 50px;
+  font-size: 36px;
+  color: #555;
+  text-align: center;
+}
+
+/* font-size 수정 */
+
+
+#busInfo {
+	font-size: 1.25em;
+}
+
+#destInfo {
+	font-size: 1.25em;
+}
+
+#transferBtn {
+  font-size: 1.4rem; /* 또는 20px 등 원하는 크기로 설정 */
+  font-weight: bold;
+}
+
+#listenBtn{
+	font-size: 1.4rem; /* 또는 20px 등 원하는 크기로 설정 */
+ 	font-weight: bold;
+}
+
+
+/* style.css 또는 <style> 태그 내부 */
+.overall-bold {
+  font-weight: 600; /* 약간 bold하게 (normal은 400, bold는 700) */
+  font-size: 1.25em;
+}
+
+.highlight-station {
+  font-weight: 1000; /* 더 bold하게 (최대치에 가깝게) */
+  color: #0042ED; /* 예시: 강조를 위한 색상 */
+}
+/* font-size 수정 끝! */
+
+/* mainContent를 기존 body의 flexbox 아이템으로 유지 */
+#mainContent {
+  display: none;
+}
+#listenBtn { box-shadow: 2px 2px 5px #BDBDBD; }
+#transferBtn { box-shadow: 2px 2px 5px gray; }
+
+/* New styles for progress bar - 선이 보이도록 높이와 색상 설정 */
+.progress-bar-segment {
+  height: 12px; /* 선의 두께 증가 */
+  flex: 1;
+  margin-left: -8px; /* 왼쪽 점과 겹치도록 음수 마진 설정 */
+  margin-right: -8px; /* 기본: 오른쪽 점과 겹치도록 음수 마진 설정 */
+  border-radius: 6px; /* 선의 모서리를 둥글게 (높이의 절반) */
+  /* background-color와 margin-right, opacity에 transition 적용 */
+  transition: background-color 0.3s ease, margin-right 0.3s ease; /* opacity transition 제거 */
+  position: relative; /* z-index를 위해 필요 */
+  z-index: 0; /* 점 뒤에 오도록 z-index 설정 */
+}
+
+/* 다음 점과 같은 타입일 때 오른쪽 겹침 방지 */
+.progress-bar-segment.no-right-overlap {
+  margin-right: 0px; /* 오른쪽 점과 겹치지 않고 붙도록 마진 설정 */
+}
+
+/* Bus Type Base Colors (will be lightened/darkened by JS) */
+/* These classes are primarily for data-base-color in JS */
+.bus-general-base { background-color: #0042ED; } /* Example: Blue for general bus*/
+.bus-express-base { background-color: #FF0000; } /* Example: Red for express bus*/
+.bus-village-base { background-color: #008000; } /* Example: Green for village bus*/
+.walk-segment-base { background-color: #A0A0A0; } /* Gray for walking*/
+
+/* No specific .dimmed class in CSS, JS will directly apply lightened colors */
