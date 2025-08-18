@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>버스 환승 도우미</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 추가적인 스타일이 필요하다면 여기에 작성합니다. */
+        #startButton {}
+    </style>
+</head>
+<body class="bg-white flex flex-col items-center justify-center min-h-screen p-6 text-center">
+
+    <div class="w-full max-w-md">
+        <!-- 메인 타이틀 -->
+        <h1 id="main-title" class="text-4xl md:text-5xl font-bold mb-4">여행의 시작, 버스 환승 도우미</h1>
+        
+        <!-- API 호출 후 정류장 이름이 표시될 영역 -->
+        <p id="station-info" class="text-4xl md:text-5xl font-bold mb-8"></p>
+
+        <!-- 설명 텍스트 -->
+        <p id="description" class="text-gray-500 text-lg mb-8">원활한 서비스 이용을 위해 개인정보 수집에 동의해주세요.</p>
+
+        <!-- 시작하기 버튼 -->
+        <button id="startButton" style="box-shadow: 3px 3px 6px gray;" class="w-full py-4 px-4 rounded-lg bg-blue-500 text-white font-bold text-2xl hover:bg-blue-700 transition duration-300 shadow-md" disabled>
+            동의 및 시작하기
+        </button>
+        
+        <!-- 로딩 스피너 (API 호출 시 표시) -->
+        <div id="loading" class="hidden mt-8">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- type="module"을 추가하여 JS 파일에서 import를 사용할 수 있게 합니다. -->
+    <script type="module" src="/index.js"></script>
+</body>
+</html>
