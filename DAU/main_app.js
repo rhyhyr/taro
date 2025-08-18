@@ -39,6 +39,8 @@ async function renderCurrentStep(stepIndex) {
       document.getElementById('destInfo').style.display = 'block';
       document.getElementById('listenBtn').style.display = 'inline-block';
       document.getElementById('transferBtn').innerText = '환승';
+      // ✨BUG FIX: 버스 안내 시, 환승 안내 문구로 변경합니다.
+      document.getElementById('transferInstruction').innerText = '하차 후, 환승을 누르세요';
 
       const transferBtn = document.getElementById('transferBtn');
       transferBtn.classList.remove('w-full');
@@ -158,7 +160,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const endy = window.endy;
 
   // API 키 유효성 검사
-  if (!AppState.ODsay_url || !AppState.Busan) {
+  if (!AppState.ODsay_ip || !AppState.Busan) {
       alert("API 키가 로드되지 않았습니다. api.js 파일과 app_config_state.js 파일의 설정을 확인해주세요.");
       UIManager.toggleLoadingOverlay(false); // 로딩 오버레이 숨김
       return;
@@ -265,7 +267,7 @@ document.getElementById('transferBtn').addEventListener('click', () => {
     // walkInstruction 엘리먼트를 재활용하여 메시지를 표시합니다.
     // 기존 위치와 다른 스타일로 중앙에 배치
     const walkInstructionEl = document.getElementById('walkInstruction');
-    walkInstructionEl.innerHTML = `<p class='text-2xl font-bold text-center mt-8'>저희 타로를 이용해주셔서 감사합니다.</p>`;
+    walkInstructionEl.innerHTML = `<p class='text-2xl font-bold text-center mt-8'>목적지에 도착했습니다. <br> 이용해주셔서 감사합니다.</p>`;
     walkInstructionEl.style.marginTop = '4rem'; // 상단 노선과의 간격 조정
     
     UIManager.toggleTransferButtonAndInstruction(false); // '환승' 버튼 및 안내 숨김 (중복이지만 확실히)

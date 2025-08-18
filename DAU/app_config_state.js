@@ -2,9 +2,9 @@
 // 애플리케이션의 전역 설정과 상태 변수들을 정의합니다.
 
 // API 키는 api.js 파일에서 가져옵니다.
-import { ODsay_url, Busan } from './api.js';
+import { ODsay_ip, Busan } from './api.js';
 
-export { ODsay_url, Busan }; // 다른 모듈에서 사용 가능하도록 재내보내기 (re-export)
+export { ODsay_ip, Busan }; // 다른 모듈에서 사용 가능하도록 재내보내기 (re-export)
 
 // 애플리케이션의 핵심 상태 변수들
 export let currentStep = 0;

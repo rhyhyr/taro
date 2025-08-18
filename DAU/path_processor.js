@@ -1,7 +1,7 @@
 // path_processor.js
 // 경로 데이터 처리 및 실시간 정보 연동 기능을 담당합니다.
 
-import { ODsay_url, Busan } from './app_config_state.js'; // API 키 가져오기 (app_config_state에서 re-export된 것을 사용)
+import { ODsay_ip, Busan } from './app_config_state.js'; // API 키 가져오기 (app_config_state에서 re-export된 것을 사용)
 
 /**
  * XML 요소에서 특정 태그의 텍스트 콘텐츠를 가져옵니다.
@@ -53,13 +53,13 @@ export async function getMinArrivalTime(stationId, busNo) {
  * @returns {Promise<object|null>} - 처리된 경로 데이터 (최적/추천 경로) 또는 null
  */
 export async function fetchAndScorePaths(startx, starty, endx, endy) {
-  const url = `https://api.odsay.com/v1/api/searchPubTransPathT?SX=${startx}&SY=${starty}&EX=${endx}&EY=${endy}&SearchPathType=2&apiKey=${ODsay_url}`;
+  const url = `https://api.odsay.com/v1/api/searchPubTransPathT?SX=${startx}&SY=${starty}&EX=${endx}&EY=${endy}&SearchPathType=2&apiKey=${ODsay_ip}`;
   
   const res = await fetch(url);
   const data = await res.json();
   console.log("ODsay API 응답:", data);
 
-  const paths = data.result?.path?.slice(0, 4); // ODsay에서 받은 경로 중 최대 4개 경로를 가져옵니다.
+  const paths = data.result?.path?.slice(0, 6); // ODsay에서 받은 경로 중 최대 4개 경로를 가져옵니다.
   if (!paths || paths.length === 0) {
     return null;
   }
@@ -69,7 +69,9 @@ export async function fetchAndScorePaths(startx, starty, endx, endy) {
   const scoredPaths = await Promise.all(paths.map(async (path) => {
     let walkTime = 0, transfers = path.info.busTransitCount, minArrival = Infinity;
     let isValid = true;
-    let subPathsWithBusType = []; 
+    let subPathsWithBusType = [];
+    // '같은 정류장 이용' 조건 확인 변수
+    let isSameStartStop = path.subPath.length > 0 && path.subPath[0].trafficType === 3 && path.subPath[0].distance <= 3;
 
     for (const sub of path.subPath) {
       if (sub.trafficType === 3) { // 도보 구간
@@ -100,7 +102,7 @@ export async function fetchAndScorePaths(startx, starty, endx, endy) {
     }
     return {
       path: { ...path, subPath: subPathsWithBusType }, 
-      walkTime, transfers, minArrival, totalTime: path.info.totalTime, isValid
+      walkTime, transfers, minArrival, totalTime: path.info.totalTime, isValid, isSameStartStop
     };
   }));
 
@@ -109,10 +111,15 @@ export async function fetchAndScorePaths(startx, starty, endx, endy) {
     return null; // 유효한 경로 없음
   }
 
-  // 최적 경로(환승 횟수, 도보 시간, 버스 도착 시간 순)를 선택
+  // 최적 경로(1.같은 정류장, 2.환승 횟수, 3.버스 도착 시간 순)를 선택
   const best = validPaths.sort((a, b) => {
+	    // 1. 같은 정류장 이용 우선 (isSameStartStop이 true인 경로를 최우선으로)
+        if (a.isSameStartStop !== b.isSameStartStop) {
+            return b.isSameStartStop - a.isSameStartStop; // boolean을 숫자로 변환하여 true가 앞으로 오도록 정렬
+        }
+        // 2. 환승 횟수가 적은 순
 	    if (a.transfers !== b.transfers) return a.transfers - b.transfers;
-	    if (a.walkTime !== b.walkTime) return a.walkTime - b.walkTime;
+	    // 3. 버스 도착 시간이 빠른 순
 	    return a.minArrival - b.minArrival;
   })[0];
 

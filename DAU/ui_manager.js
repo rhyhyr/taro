@@ -72,8 +72,24 @@ export function setDestination(dest) {
  * @param {number} time - 총 소요 시간 (분)
  */
 export function setTotalTime(time) {
-  document.getElementById('totalTime').textContent = '총 소요시간: ' + time + '분';
+  let formattedTime;
+  
+  if (time < 60) {
+    formattedTime = `${time}분`;
+  } else {
+    const hours = Math.floor(time / 60);
+    const minutes = time % 60;
+    
+    if (minutes === 0) {
+      formattedTime = `${hours}시간`;
+    } else {
+      formattedTime = `${hours}시간 ${minutes}분`;
+    }
+  }
+
+  document.getElementById('totalTime').textContent = `총 소요시간: ${formattedTime}`;
 }
+
 
 /**
  * 버스 아이콘의 위치를 현재 진행 단계에 맞춰 이동시킵니다.
@@ -361,7 +377,11 @@ export function toggleRecommendationInfo(show, distanceText = '', fasterTimeText
     const viewRouteBtn = document.getElementById('viewRouteBtn');
 
     if (show) {
-        recommendationTextContainer.innerHTML = `<span id=\"distanceTime\">${distanceText}</span> 거리에 <span id=\"fasterTime\">${fasterTimeText}</span> 빠른 경로가 존재합니다.`;
+        if (distanceText === '0m') {
+            recommendationTextContainer.innerHTML = `같은 정류장에 <span id="fasterTime">${fasterTimeText}</span> 빠른 경로가 존재합니다.`;
+        } else {
+            recommendationTextContainer.innerHTML = `<span id="distanceTime">${distanceText}</span> 거리에 <span id="fasterTime">${fasterTimeText}</span> 빠른 경로가 존재합니다.`;
+        }
         recommendationTextContainer.style.display = 'block';
         viewRouteBtn.style.display = 'block';
     } else {
