@@ -1,7 +1,7 @@
 // path_processor.js
 // 경로 데이터 처리 및 실시간 정보 연동 기능을 담당합니다.
 
-import { ODsay_ip, Busan } from './app_config_state.js'; // API 키 가져오기 (app_config_state에서 re-export된 것을 사용)
+import { ODsay_url, Busan } from './app_config_state.js'; // API 키 가져오기 (app_config_state에서 re-export된 것을 사용)
 
 /**
  * XML 요소에서 특정 태그의 텍스트 콘텐츠를 가져옵니다.
@@ -53,13 +53,13 @@ export async function getMinArrivalTime(stationId, busNo) {
  * @returns {Promise<object|null>} - 처리된 경로 데이터 (최적/추천 경로) 또는 null
  */
 export async function fetchAndScorePaths(startx, starty, endx, endy) {
-  const url = `https://api.odsay.com/v1/api/searchPubTransPathT?SX=${startx}&SY=${starty}&EX=${endx}&EY=${endy}&SearchPathType=2&apiKey=${ODsay_ip}`;
+  const url = `https://api.odsay.com/v1/api/searchPubTransPathT?SX=${startx}&SY=${starty}&EX=${endx}&EY=${endy}&SearchPathType=2&apiKey=${ODsay_url}`;
   
   const res = await fetch(url);
   const data = await res.json();
   console.log("ODsay API 응답:", data);
 
-  const paths = data.result?.path?.slice(0, 6); // ODsay에서 받은 경로 중 최대 4개 경로를 가져옵니다.
+  const paths = data.result?.path?.slice(0, 6); // ODsay에서 받은 경로 중 최대 6개 경로를 가져옵니다.
   if (!paths || paths.length === 0) {
     return null;
   }

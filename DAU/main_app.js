@@ -79,7 +79,7 @@ async function renderCurrentStep(stepIndex) {
   // currentStep이 마지막 세그먼트의 인덱스(`routeSteps.length - 1`)와 같으면 '도착' 표시
   if (AppState.currentStep === AppState.routeSteps.length - 1) {
     document.getElementById('transferBtn').innerText = '도착';
-    document.getElementById('transferInstruction').innerText = '목적지에 도착했습니다.';
+    document.getElementById('transferInstruction').innerText = '목적지에 도착 후, 도착을 누르세요';
     UIManager.toggleRecommendationInfo(false); // 도착 시 추천 경로 정보 숨김
   } else if (AppState.currentStep < AppState.routeSteps.length -1 ) { // 마지막 단계 전이면 '환승' 안내
     //document.getElementById('transferInstruction').innerText = '하차 후, 환승을 누르세요';
@@ -160,7 +160,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const endy = window.endy;
 
   // API 키 유효성 검사
-  if (!AppState.ODsay_ip || !AppState.Busan) {
+  if (!AppState.ODsay_url || !AppState.Busan) {
       alert("API 키가 로드되지 않았습니다. api.js 파일과 app_config_state.js 파일의 설정을 확인해주세요.");
       UIManager.toggleLoadingOverlay(false); // 로딩 오버레이 숨김
       return;
@@ -305,15 +305,26 @@ function setupStarRating() {
   });
 }
 
-// 특정 정류장 이미지 추가
-function setupImage(nextSubPath){
-	const imageElement = document.getElementById('myImage');
-	if (imageElement) {
-	    // 다음 경로가 존재하고, 버스 경로이며, startArsID가 "03719"일 경우
-	    if (nextSubPath && nextSubPath.trafficType === 2 && nextSubPath.startArsID === '03719') {
-	        imageElement.style.display = 'block'; // 이미지 활성화
-	    } else {
-	        imageElement.style.display = 'none'; // 이미지 숨김
-	    }
-	}
+/**
+ * 특정 정류장 이미지를 조건에 따라 표시하거나 숨깁니다.
+ * @param {object | null} nextSubPath - 다음 경로 단계 객체
+ */
+function setupImage(nextSubPath) {
+  const imageElement = document.getElementById('myImage');
+  if (imageElement) {
+    // 다음 경로가 존재하고, 버스 경로이며, startArsID가 '09259'일 경우 '센텀시티역.벡스코 광안리방향'
+    if (nextSubPath && nextSubPath.trafficType === 2 && nextSubPath.startArsID === '09259') {
+      imageElement.src = "/Bexco.png";
+      imageElement.style.display = 'block'; // 이미지 활성화
+    } 
+    // 다음 경로가 존재하고, 버스 경로이며, startArsID가 '09715'일 경우 '동해선.벡스코역 센텀방향'
+    else if (nextSubPath && nextSubPath.trafficType === 2 && nextSubPath.startArsID === '09715') {
+      imageElement.src = "DongheaBexco.png";
+      imageElement.style.display = 'block'; // 이미지 활성화
+    } 
+    // 위 조건들에 해당하지 않는 모든 경우
+    else {
+      imageElement.style.display = 'none'; // 이미지 숨김
+    }
+  }
 }
