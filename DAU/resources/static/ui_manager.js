@@ -9,7 +9,7 @@
 export function setCurrentStation(station, isWalk = false) {
   const el = document.getElementById('walkInstruction');
   if (isWalk) {
-    el.innerHTML = `<p class='text-2xl'>${station}</p>`;
+    el.innerHTML = `<p class='text-2xl mb-10'>${station}</p>`;
   } else {
     el.innerHTML = `<p class='font-bold text-2xl'> 현재 <span id='currentStation'>${station}</span></p>`;
   }
@@ -339,10 +339,12 @@ export function toggleLoadingOverlay(show) {
     const mainContent = document.getElementById('mainContent');
     if (show) {
         loadingOverlay.style.display = 'flex';
-        mainContent.style.display = 'none';
+        // mainContent에서 .visible 클래스를 제거하여 숨김
+        mainContent.classList.remove('visible');
     } else {
         loadingOverlay.style.display = 'none';
-        mainContent.style.display = 'block';
+        // mainContent에 .visible 클래스를 추가하여 표시
+        mainContent.classList.add('visible');
     }
 }
 

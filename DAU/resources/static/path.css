@@ -1,5 +1,7 @@
 body {
 	font-size: 1.25em;
+	height: 100vh;
+	margin: 0;
 }
 
 .bus-position {
@@ -112,10 +114,25 @@ body {
 }
 /* font-size 수정 끝! */
 
-/* mainContent를 기존 body의 flexbox 아이템으로 유지 */
+/* #mainContent의 초기 상태: flex지만 보이지 않음 */
 #mainContent {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+
+  /* 초기에는 보이지 않도록 설정 */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
 }
+
+/* mainContent를 보여줄 때 사용할 클래스 */
+#mainContent.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
 #listenBtn { box-shadow: 2px 2px 5px #BDBDBD; }
 #transferBtn { box-shadow: 2px 2px 5px gray; }
 
@@ -188,7 +205,7 @@ body {
 	width: 360px;
 	height: 200px;
 	object-fit: fill;
-	margin-top: -5px;
+	margin-top: 10px;
 	margin-bottom: 10px;
 	
 }   
