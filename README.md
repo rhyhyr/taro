@@ -45,6 +45,7 @@
 ---
 
 ## 📂 프로젝트 구조
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image.png)
 
 ---
 
@@ -54,3 +55,4 @@
 ---
 
 ## 📜 라이선스
+MIT License
