@@ -1,5 +1,11 @@
 # 👵 디지털 취약계층을 위한 스마트 버스 정보 시스템
 
+## 📰 프로젝트 요약
+
+👉 타로는 NFC 태그를 활용해 **앱 설치 없이 웹 브라우저** 만으로도 버스 경로를 안내 받을 수 있는 서비스입니다.
+
+👉 음성·텍스트 입력 기반으로, **고령자 맞춤형 UI/UX**를 제공합니다.
+<br><br>
 버스를 이용하는 어르신들이 기사님께 "이 버스 여기 가나요?"라고 묻는 모습에서 출발한 프로젝트입니다.  
 기존 버스 정류장 안내판은 도착 시간만 알려줄 뿐, **목적지까지 어떤 버스를 타야 하는지**는 알려주지 못합니다.  
 또한 스마트폰 지도 앱은 복잡한 기능과 작은 글씨로 인해 디지털 소외계층에게 사용하기 어렵습니다.  
@@ -77,13 +83,19 @@
 
 
 ## 📂 프로젝트 구조
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image.png)
+![타로 구조도](https://github.com/rhyhyr/taro/tree/main/image/프로젝트-구조도.png)
 
 <br><br>
 
 
 ## 📸 데모 / 스크린샷
-(추가 예정 – 프로토타입 화면 및 NFC 시연 이미지 첨부)  
+![현재 위치 안내 및 개인정보 동의](https://github.com/rhyhyr/taro/tree/main/image/1.-현재-위치-안내-및-개인정보-동의.png)
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
 
 <br><br>
 
