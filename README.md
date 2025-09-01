@@ -83,14 +83,16 @@
 
 
 ## 📂 프로젝트 구조
-![타로 구조도](https://github.com/rhyhyr/taro/tree/main/image/프로젝트-구조도.png)
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트%20구조도.png)
 
 <br><br>
 
 
 ## 📸 데모 / 스크린샷
-![현재 위치 안내 및 개인정보 동의](https://github.com/rhyhyr/taro/tree/main/image/1.-현재-위치-안내-및-개인정보-동의.png)
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
+![현재 위치 안내 및 개인정보 동의](https://github.com/rhyhyr/taro/blob/main/image/1.%20현재%20위치%20안내%20및%20개인정보%20동의.png)
+
+
+![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/2.%20도착지%20입력.png)
 ![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
 ![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
 ![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
