@@ -89,15 +89,13 @@
 
 
 ## 📸 데모 / 스크린샷
-![현재 위치 안내 및 개인정보 동의](https://github.com/rhyhyr/taro/blob/main/image/1.%20현재%20위치%20안내%20및%20개인정보%20동의.png)
-
-
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/2.%20도착지%20입력.png)
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
-![타로 구조도](https://github.com/rhyhyr/taro/blob/main/image/프로젝트-구조도.png)
+![현재 위치 안내 및 개인정보 동의](https://github.com/rhyhyr/taro/blob/39dfc0f24dc617a1acd635fd7eeac4bc37cca9eb/image/1.%20%E1%84%92%E1%85%A7%E1%86%AB%E1%84%8C%E1%85%A2%20%E1%84%8B%E1%85%B1%E1%84%8E%E1%85%B5%20%E1%84%8B%E1%85%A1%E1%86%AB%E1%84%82%E1%85%A2%20%E1%84%86%E1%85%B5%E1%86%BE%20%E1%84%80%E1%85%A2%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%8C%E1%85%A5%E1%86%BC%E1%84%87%E1%85%A9%20%E1%84%83%E1%85%A9%E1%86%BC%E1%84%8B%E1%85%B4.png)
+![도착지 입력](https://github.com/rhyhyr/taro/blob/39dfc0f24dc617a1acd635fd7eeac4bc37cca9eb/image/2.%20%E1%84%83%E1%85%A9%E1%84%8E%E1%85%A1%E1%86%A8%E1%84%8C%E1%85%B5%20%E1%84%8B%E1%85%B5%E1%86%B8%E1%84%85%E1%85%A7%E1%86%A8.png)
+![도착지 리스트](https://github.com/rhyhyr/taro/blob/39dfc0f24dc617a1acd635fd7eeac4bc37cca9eb/image/3.%20%E1%84%83%E1%85%A9%E1%84%8E%E1%85%A1%E1%86%A8%E1%84%8C%E1%85%B5%20%E1%84%85%E1%85%B5%E1%84%89%E1%85%B3%E1%84%90%E1%85%B3.png)
+![경로 로딩 페이지](https://github.com/rhyhyr/taro/blob/39dfc0f24dc617a1acd635fd7eeac4bc37cca9eb/image/4.%20%E1%84%80%E1%85%A7%E1%86%BC%E1%84%85%E1%85%A9%20%E1%84%85%E1%85%A9%E1%84%83%E1%85%B5%E1%86%BC%20%E1%84%91%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%8C%E1%85%B5.png)
+![도보 이동 시 안내 페이지](https://github.com/rhyhyr/taro/blob/39dfc0f24dc617a1acd635fd7eeac4bc37cca9eb/image/5.%20%E1%84%83%E1%85%A9%E1%84%87%E1%85%A9%20%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%86%BC%20%E1%84%89%E1%85%B5%20%E1%84%8B%E1%85%A1%E1%86%AB%E1%84%82%E1%85%A2%20%E1%84%91%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%8C%E1%85%B5.png)
+![경로 시작](https://github.com/rhyhyr/taro/blob/39dfc0f24dc617a1acd635fd7eeac4bc37cca9eb/image/6.%20%E1%84%80%E1%85%A7%E1%86%BC%E1%84%85%E1%85%A9%20%E1%84%89%E1%85%B5%E1%84%8C%E1%85%A1%E1%86%A8.png)
+![도착](https://github.com/rhyhyr/taro/blob/39dfc0f24dc617a1acd635fd7eeac4bc37cca9eb/image/7.%20%E1%84%83%E1%85%A9%E1%84%8E%E1%85%A1%E1%86%A8.png)
 
 <br><br>
 
